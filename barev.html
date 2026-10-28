@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}</style>
+<title>Barev Events</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=Noto+Sans+Armenian:wght@600&display=swap">
+<style>
+/* Layout: one narrow column — header, controls, ranked event cards, then "coming next". */
+:root {
+  --bg: #f6f3f4;
+  --surface: #ffffff;
+  --ink: #1e1a1c;
+  --muted: #6c6267;
+  --line: #e6dfe1;
+  --accent: #a3243b;      /* pomegranate */
+  --accent-soft: #f6e3e6;
+  --apricot: #c9761c;     /* flag orange, darkened for text */
+  --good: #2f7a4f;
+  --warn: #9a6400;
+  --low: #8a8085;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --armenian: "Noto Sans Armenian", "Sylfaen", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141113; --surface: #1e191b; --ink: #f2ecee; --muted: #a99da2; --line: #362e31;
+    --accent: #e8596f; --accent-soft: #3a1d24; --apricot: #f0a952; --good: #5cc28a; --warn: #e2b04a; --low: #8f8489;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141113; --surface: #1e191b; --ink: #f2ecee; --muted: #a99da2; --line: #362e31;
+  --accent: #e8596f; --accent-soft: #3a1d24; --apricot: #f0a952; --good: #5cc28a; --warn: #e2b04a; --low: #8f8489;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: grid; gap: 24px; }
+a { color: var(--accent); }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header { display: grid; gap: 6px; }
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.brand h1 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -0.02em; margin: 0; }
+.brand .hy { font-family: var(--armenian); color: var(--accent); font-size: 20px; }
+header p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); flex-wrap: wrap; }
+.seg button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.sort { display: flex; gap: 8px; align-items: center; color: var(--muted); }
+.sort select { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+
+details.prefs { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+details.prefs summary { cursor: pointer; font-weight: 600; }
+details.prefs summary span { color: var(--muted); font-weight: 400; }
+.sliders { display: grid; gap: 12px; margin-top: 14px; }
+.slider { display: grid; grid-template-columns: 110px 1fr 36px; gap: 12px; align-items: center; }
+.slider label { font-weight: 500; }
+.slider output { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.slider input { accent-color: var(--accent); width: 100%; }
+.reset { margin-top: 10px; background: none; border: 0; color: var(--accent); cursor: pointer; padding: 0; text-decoration: underline; }
+
+.count { color: var(--muted); font-size: 13px; margin: 0; }
+.list { display: grid; gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; grid-template-columns: 64px 1fr; gap: 16px; }
+.score { display: grid; justify-items: center; align-content: start; gap: 4px; }
+.score b { font-family: var(--display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.score small { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; text-align: center; }
+.score.high b, .score.high small { color: var(--good); }
+.score.mid b, .score.mid small { color: var(--warn); }
+.score.low b, .score.low small { color: var(--low); }
+.body { min-width: 0; display: grid; gap: 8px; }
+.meta { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.meta .when { color: var(--apricot); font-weight: 600; }
+.card h2 { font-family: var(--display); font-weight: 500; font-size: 19px; line-height: 1.25; margin: 0; text-wrap: balance; }
+.reason { margin: 0; }
+.flag { font-size: 12px; color: var(--warn); }
+.bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.bar { display: grid; gap: 3px; font-size: 11px; color: var(--muted); }
+.bar i { display: block; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bar i::after { content: ""; display: block; height: 100%; width: var(--v); background: var(--accent); border-radius: 3px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); text-decoration: none; color: var(--ink); font-size: 14px; cursor: pointer; }
+.btn.wa { background: var(--accent); border-color: var(--accent); color: #fff; }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; color: var(--muted); }
+.empty strong { color: var(--ink); display: block; margin-bottom: 4px; }
+
+.next { display: grid; gap: 12px; }
+.next h3 { font-family: var(--display); font-weight: 700; font-size: 22px; margin: 0; }
+.next ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.next li { background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; }
+.next li b { display: block; margin-bottom: 2px; }
+.next li span { color: var(--muted); font-size: 14px; }
+footer { color: var(--muted); font-size: 12px; }
+
+@media (max-width: 560px) {
+  .card { grid-template-columns: 1fr; }
+  .score { grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
+  .bars { grid-template-columns: repeat(3, 1fr); }
+  .next ul { grid-template-columns: 1fr; }
+  .slider { grid-template-columns: 96px 1fr 32px; }
+}
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } .card:hover { border-color: var(--muted); } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>Barev Events</h1><span class="hy" lang="hy">Բարեւ</span></div>
+    <p>Every Armenian event in the UK in one place, ranked by how much it's worth going for you: time to meet people first, Armenian culture close behind.</p>
+  </header>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="City">
+      <button type="button" data-city="all" aria-pressed="true">All UK</button>
+      <button type="button" data-city="London" aria-pressed="false">London</button>
+      <button type="button" data-city="Manchester" aria-pressed="false">Manchester</button>
+      <button type="button" data-city="Other" aria-pressed="false">Rest of UK</button>
+    </div>
+    <div class="sort"><label for="sort">Sort</label>
+      <select id="sort"><option value="score">Best match</option><option value="date">Soonest</option></select>
+    </div>
+  </div>
+
+  <details class="prefs" id="prefs">
+    <summary>What matters to you <span>· adjust and the ranking updates</span></summary>
+    <div class="sliders" id="sliders"></div>
+    <button type="button" class="reset" id="reset">Reset to defaults</button>
+  </details>
+
+  <p class="count" id="count"></p>
+  <div class="list" id="list"></div>
+
+  <section class="next">
+    <h3>Coming next</h3>
+    <ul>
+      <li><b>People you've met</b><span>Scan a QR code at an event to connect, without swapping Instagram.</span></li>
+      <li><b>Who's going</b><span>"3 people you met at the Bakery Session are going to this."</span></li>
+      <li><b>Weekly digest</b><span>Your top matches by email or WhatsApp, for people who aren't on social media.</span></li>
+      <li><b>Organiser submissions</b><span>AGBU, St Sarkis, Jakob's and others add events with format, food and music details.</span></li>
+    </ul>
+  </section>
+
+  <footer>Events gathered on 28 October 2026 from Armenopole, the Armenian Institute, the Armenian Church Diocese of the UK &amp; Ireland, CAIA and Eventbrite. Scores are a demo of the Worth It rubric. Always check the original listing before you go.</footer>
+</div>
+
+<script>
+const FACTORS = [
+  { key: "net",  label: "Networking", def: 35 },
+  { key: "cult", label: "Culture",    def: 25 },
+  { key: "ppl",  label: "People",     def: 15 },
+  { key: "prac", label: "Practical",  def: 15 },
+  { key: "rep",  label: "Reputation", def: 10 },
+];
+
+// Factor scores are 0–10. Sources: organiser and listing pages linked in `url`.
+const EVENTS = [
+  { title: "The Bakery Session", org: "AGBU YP London with Ararat House", date: "2026-11-08", time: "3:00 pm", venue: "Jakob's, 20 Gloucester Road, SW7", city: "London", price: "Drink included · price on listing",
+    reason: "AGBU YP afternoon at Jakob's with DJ Sevana Tchak and a drink included. Made for your age group and for mingling.",
+    f: { net: 9, cult: 7, ppl: 10, prac: 7, rep: 8 }, url: "https://www.eventbrite.co.uk/e/agbu-yp-london-bakery-session-tickets-2003545014071" },
+  { title: "Armenian Circle Dances | Edition 9", org: "AGBU London", date: "2026-11-07", time: "4:00–5:00 pm", venue: "Nevart Gulbenkian Hall, 20 Iverna Gardens, W8", city: "London", price: "Price on listing",
+    reason: "Learn Armenian circle dances. No experience needed, and the organisers invite you to make new friends. Only an hour long.",
+    f: { net: 8, cult: 10, ppl: 7, prac: 7, rep: 8 }, url: "https://www.eventbrite.co.uk/e/armenian-circle-dances-edition-9-tickets-2003381489966" },
+  { title: "25th Anniversary Gala", org: "Armenian Institute", date: "2026-11-06", time: "6:30–10:00 pm", venue: "Savile Club, 69 Brook Street, W1K", city: "London", price: "Price not listed",
+    reason: "Three and a half hours with dinner and live music from ArNor Duo: plenty of time to meet people. Formal, and the price isn't listed.",
+    f: { net: 8, cult: 8, ppl: 6, prac: 4, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/25th-anniversary-gala", flag: "Price not listed" },
+  { title: "British Armenian Chamber of Commerce Launch Reception", org: "British Armenian Chamber of Commerce", date: "2026-10-29", time: "6:30–7:30 pm", venue: "Tower Suites by Blue Orchid, 100 Minories, EC3N", city: "London", price: "£30",
+    reason: "Built for networking, with drinks and canapés among Armenian business people. Short, and light on culture.",
+    f: { net: 9, cult: 4, ppl: 7, prac: 6, rep: 5 }, url: "https://armenopole.com/british-armenian-chamber-of-commerce-official-launch-reception.html" },
+  { title: "Concert: Celebration of Armenian Music", org: "Klingen Choir & Cultural Association", date: "2026-11-15", time: "7:00 pm", venue: "St Paul's Knightsbridge, 32a Wilton Place, SW1X", city: "London", price: "£15–£20",
+    reason: "Orchestra and choir perform Babajanian and Spendiaryan for 35 years of independence. Free refreshments at the interval, but mostly listening.",
+    f: { net: 3, cult: 10, ppl: 5, prac: 8, rep: 7 }, url: "https://www.eventbrite.co.uk/e/concert-in-london-celebration-of-armenian-music-tickets-2003122614663" },
+  { title: "The Beauty of Priesthood: Fundraising Dinner", org: "Armenian Church Diocese of the UK & Ireland", date: "2026-11-21", time: "Time not listed", venue: "Venue not listed", city: "London", price: "Price not listed",
+    reason: "A dinner should be good for meeting people, but the listing has no time, venue or price yet.",
+    f: { net: 7, cult: 6, ppl: 4, prac: 2, rep: 7 }, url: "https://www.armenianchurch.org.uk/events/the-beauty-of-priesthood-fundraising-dinner", flag: "Missing time, venue and price" },
+  { title: "Hovig Live", org: "Xamos Live with CWF Events", date: "2026-10-30", time: "9:00 pm", venue: "Faces Night Club, Gants Hill", city: "London", price: "Price not listed",
+    reason: "A big night out with live music, but a concert leaves little time to talk. Far from central London.",
+    f: { net: 5, cult: 8, ppl: 7, prac: 4, rep: 6 }, url: "https://armenopole.com/hovig-live.html", flag: "Price not listed" },
+  { title: "Mother & Daughter Afternoon Tea", org: "Organiser not named", date: "2026-11-21", time: "5:00 pm", venue: "Navassartian Centre, 223 Northfield Avenue, W13", city: "London", price: "£30 (adults)",
+    reason: "A social afternoon tea with Prosecco, but aimed at mothers and daughters, and the organiser isn't named.",
+    f: { net: 6, cult: 4, ppl: 4, prac: 5, rep: 4 }, url: "https://armenopole.com/mother-daughter-afternoon-tea.html" },
+  { title: "Echoes of the Past, Voices of the Present", org: "Armenian Institute", date: "2026-11-12", time: "6:30–8:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Book on Eventbrite",
+    reason: "Talk and readings with Maureen Freely, Andrew Finkel and Tamara Wilson. Interesting, but mostly listening.",
+    f: { net: 3, cult: 7, ppl: 5, prac: 7, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/echoes-of-the-past-voices-of-the-present" },
+  { title: "Armenian History x Digital Humanities", org: "Armenian Institute", date: "2026-12-03", time: "7:30–9:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Book on Eventbrite",
+    reason: "Panel on games, playable archives and digital storytelling. Mostly listening.",
+    f: { net: 3, cult: 6, ppl: 6, prac: 7, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/armenian-history-x-digital-humanities-immersive-worlds-playable-archives-and-experimental-storytelling-platforms" },
+  { title: "Bones in the Desert", org: "Armenian Institute (co-host)", date: "2026-11-14", time: "7:00–9:00 pm", venue: "Half Moon Young People's Theatre, E1", city: "London", price: "Price on listing",
+    reason: "Theatre performance followed by a discussion with writer Joe Nerssessian. Mostly sitting and watching.",
+    f: { net: 3, cult: 7, ppl: 5, prac: 5, rep: 7 }, url: "https://www.armenianinstitute.org.uk/events/bones-in-the-desert-performance-and-discussion-with-writer-joe-nerssessian-" },
+  { title: "Armenia's House Museums on Screen", org: "Armenian Institute", date: "2026-11-19", time: "6:30–8:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Book on Eventbrite",
+    reason: "Short films on Parajanov, Charents and Aguletsi with the director. A screening, so an easy skip if you want to meet people.",
+    f: { net: 2, cult: 7, ppl: 5, prac: 7, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/armenias-house-museums-on-screen-parajanov-charents-and-aguletsi-short-films-screening-with-their-producer-christopher-atamian" },
+  { title: "Hayashen Community Lunch Club", org: "Centre for Armenian Information and Advice", date: "2026-10-30", time: "Fridays, 12:00–4:00 pm", venue: "Hayashen, 105a Mill Hill Road, W3", city: "London", price: "Free",
+    reason: "Weekly hot lunch with chess, cards and bingo, but aimed at people aged 50 and over.",
+    f: { net: 6, cult: 6, ppl: 1, prac: 9, rep: 7 }, url: "https://caia.org.uk/community-lunch-club/" },
+];
+
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const defaults = () => Object.fromEntries(FACTORS.map(f => [f.key, f.def]));
+let weights = { ...defaults(), ...(store.get("barev-weights") || {}) };
+let city = "all";
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function fmtDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${DAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]} ${d} ${MONTHS[m - 1]}`;
+}
+function score(e) {
+  const total = FACTORS.reduce((s, f) => s + weights[f.key], 0) || 1;
+  return Math.round(FACTORS.reduce((s, f) => s + weights[f.key] * e.f[f.key], 0) / total * 10);
+}
+function band(s) { return s >= 70 ? ["high", "Great match"] : s >= 55 ? ["mid", "Worth a look"] : ["low", "Easy skip"]; }
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function shareText(e) {
+  return `${e.title}\n${fmtDate(e.date)}, ${e.time}\n${e.venue}\n${e.url}\n\nFound on Barev Events`;
+}
+
+function renderSliders() {
+  document.getElementById("sliders").innerHTML = FACTORS.map(f => `
+    <div class="slider">
+      <label for="w-${f.key}">${f.label}</label>
+      <input type="range" id="w-${f.key}" min="0" max="50" step="5" value="${weights[f.key]}" data-key="${f.key}">
+      <output for="w-${f.key}" id="o-${f.key}">${weights[f.key]}</output>
+    </div>`).join("");
+}
+
+function render() {
+  const sortBy = document.getElementById("sort").value;
+  const items = EVENTS
+    .filter(e => city === "all" || (city === "Other" ? !["London", "Manchester"].includes(e.city) : e.city === city))
+    .map(e => ({ ...e, s: score(e) }))
+    .sort((a, b) => sortBy === "date" ? a.date.localeCompare(b.date) || b.s - a.s : b.s - a.s || a.date.localeCompare(b.date));
+
+  const label = city === "all" ? "across the UK" : city === "Other" ? "in the rest of the UK" : `in ${city}`;
+  document.getElementById("count").textContent = `${items.length} upcoming event${items.length === 1 ? "" : "s"} ${label}`;
+
+  const list = document.getElementById("list");
+  if (!items.length) {
+    list.innerHTML = `<div class="empty"><strong>No events found ${label} yet</strong>We couldn't find public listings here. This is exactly the gap organiser submissions will fill. Know an event? Tell the organiser about Barev Events.</div>`;
+    return;
+  }
+  list.innerHTML = items.map((e, i) => {
+    const [cls, word] = band(e.s);
+    return `<article class="card">
+      <div class="score ${cls}" aria-label="Worth It score ${e.s} out of 100"><b>${e.s}</b><small>${word}</small></div>
+      <div class="body">
+        <div class="meta"><span class="when">${fmtDate(e.date)} · ${esc(e.time)}</span><span>${esc(e.venue)}</span></div>
+        <h2>${esc(e.title)}</h2>
+        <div class="meta"><span>${esc(e.org)}</span><span>${esc(e.price)}</span></div>
+        <p class="reason">${esc(e.reason)}</p>
+        ${e.flag ? `<div class="flag">⚠ ${esc(e.flag)}. Check the listing before you go.</div>` : ""}
+        <div class="bars">${FACTORS.map(f => `<div class="bar">${f.label}<i style="--v:${e.f[f.key] * 10}%"></i></div>`).join("")}</div>
+        <div class="actions">
+          <a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(shareText(e))}" target="_blank" rel="noopener">Share on WhatsApp</a>
+          <a class="btn" href="${e.url}" target="_blank" rel="noopener">View listing</a>
+          <button type="button" class="btn" data-copy="${i}">Copy details</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+  list.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => {
+    const e = items[+b.dataset.copy];
+    navigator.clipboard.writeText(shareText(e)).then(() => { b.textContent = "Copied"; }, () => { b.textContent = "Copy failed"; });
+    setTimeout(() => { b.textContent = "Copy details"; }, 1800);
+  }));
+}
+
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+  city = b.dataset.city;
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+}));
+document.getElementById("sort").addEventListener("change", render);
+document.getElementById("sliders").addEventListener("input", ev => {
+  const k = ev.target.dataset.key; if (!k) return;
+  weights[k] = +ev.target.value;
+  document.getElementById(`o-${k}`).textContent = weights[k];
+  store.set("barev-weights", weights);
+  render();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  weights = defaults(); store.set("barev-weights", weights); renderSliders(); render();
+});
+
+renderSliders();
+render();
+</script>
+</body>
+</html>
