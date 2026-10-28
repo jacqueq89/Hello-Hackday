@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hello, World</title>
+<style>
+  :root {
+    --bg: #f2f5f0;
+    --fg: #1d2b24;
+    --muted: #5d6b64;
+    --accent: #2f6f5e;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14201b;
+      --fg: #e8efe9;
+      --muted: #9fb0a7;
+      --accent: #7cc4ad;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14201b;
+    --fg: #e8efe9;
+    --muted: #9fb0a7;
+    --accent: #7cc4ad;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Georgia, "Times New Roman", serif;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+  h1 {
+    font-size: clamp(3rem, 12vw, 8rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 0 0 1rem;
+  }
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.125rem;
+  }
+  .dot { color: var(--accent); }
+</style>
+</head>
+<body>
+  <main>
+    <h1>Hello, World<span class="dot">.</span></h1>
+    <p>Your first webpage is live.</p>
+  </main>
+</body>
+</html>
