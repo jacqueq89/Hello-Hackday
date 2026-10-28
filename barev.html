@@ -743,12 +743,12 @@ function ensureMap() {
   const root = document.documentElement.dataset.theme;
   const dark = root === "dark" || (root !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
   map = L.map("map", { scrollWheelZoom: false }).setView([51.507, -0.13], 11);
-  const tiles = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dark ? "dark_all" : "light_all"}/{z}/{x}/{y}{r}.png`, {
+  const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19, subdomains: "abcd",
-    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
   }).addTo(map);
   tiles.once("tileerror", () => mapNote("Street map images can't load in this preview. The pins still work, and the live site shows the full map."));
-  pins = L.layerGroup().addTo(map);
+  pins = L.layerGroup().addTo(map); if (dark) map.getPane("tilePane").style.filter = "invert(1) hue-rotate(180deg) brightness(.85) contrast(.9)";
   return true;
 }
 function renderMap(items, refit) {
