@@ -223,6 +223,70 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 28px; }
 .big-rate { font-family: var(--display); font-weight: 800; font-size: 22px; }
 .big-rate .star { color: var(--orange); }
 
+/* Location + map */
+.locbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+.locbar > svg { width: 18px; height: 18px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.locbar #loc-label { flex: 1 1 180px; min-width: 0; color: var(--muted); }
+.locbar #loc-label b { color: var(--ink); font-weight: 600; }
+.locbar select { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 14px; max-width: 100%; }
+.dist { color: var(--blue); font-weight: 500; font-variant-numeric: tabular-nums; }
+.mapwrap { display: grid; gap: 8px; }
+#map { height: min(62vh, 560px); min-height: 340px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface-2); box-shadow: var(--shadow); z-index: 0; }
+.pin { width: 40px; height: 46px; position: relative; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .25)); }
+.pin .b { position: absolute; inset: 0 0 6px 0; z-index: 1; background: var(--red); color: #fff; border: 2px solid #fff; border-radius: 10px; display: grid; place-items: center; align-content: center; line-height: 1; }
+.pin .b b { font-family: var(--display); font-size: 16px; font-weight: 800; }
+.pin .b span { font-size: 9px; font-weight: 700; letter-spacing: .06em; }
+.pin::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 12px; height: 12px; background: var(--red); transform: translateX(-50%) rotate(45deg); border-right: 2px solid #fff; border-bottom: 2px solid #fff; }
+.pin i { position: absolute; top: -7px; right: -7px; z-index: 2; background: var(--blue); color: #fff; font-style: normal; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 10px; display: grid; place-items: center; border: 2px solid #fff; }
+.me-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--blue); border: 3px solid #fff; box-shadow: 0 0 0 6px color-mix(in srgb, var(--blue) 25%, transparent); }
+.pop { display: grid; gap: 10px; min-width: 200px; font-family: var(--body); }
+.pop h4 { margin: 0; font-size: 13px; color: var(--muted); font-weight: 500; }
+.pop-ev { display: grid; gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); }
+.pop h4 + .pop-ev { border-top: 0; padding-top: 0; }
+.pop-ev b { font-family: var(--display); font-size: 15px; line-height: 1.2; }
+.pop-ev small { color: var(--muted); font-size: 12.5px; }
+.pop-ev button { justify-self: start; margin-top: 6px; }
+
+/* Leaflet essentials (its stylesheet can't be linked from a CDN here) */
+.leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas, .leaflet-zoom-box, .leaflet-image-layer, .leaflet-layer { position: absolute; left: 0; top: 0; }
+.leaflet-container { overflow: hidden; -webkit-tap-highlight-color: transparent; font-family: var(--body); }
+.leaflet-container.leaflet-touch-zoom { touch-action: pan-x pan-y; }
+.leaflet-container.leaflet-touch-drag { touch-action: pinch-zoom; }
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom { touch-action: none; }
+.leaflet-container img.leaflet-tile, .leaflet-container img { max-width: none !important; max-height: none !important; }
+.leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow { user-select: none; -webkit-user-drag: none; }
+.leaflet-tile { visibility: hidden; width: 256px; height: 256px; }
+.leaflet-tile-loaded { visibility: inherit; }
+.leaflet-pane { z-index: 400; } .leaflet-tile-pane { z-index: 200; } .leaflet-overlay-pane { z-index: 400; } .leaflet-shadow-pane { z-index: 500; }
+.leaflet-marker-pane { z-index: 600; } .leaflet-tooltip-pane { z-index: 650; } .leaflet-popup-pane { z-index: 700; }
+.leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-image-layer, .leaflet-pane > svg path, .leaflet-tile-container { pointer-events: none; }
+.leaflet-marker-icon.leaflet-interactive, .leaflet-pane > svg path.leaflet-interactive { pointer-events: auto; }
+.leaflet-interactive { cursor: pointer; }
+.leaflet-grab { cursor: grab; } .leaflet-dragging .leaflet-grab { cursor: move; }
+.leaflet-zoom-animated { transform-origin: 0 0; }
+.leaflet-zoom-anim .leaflet-zoom-animated { transition: transform .25s cubic-bezier(0, 0, .25, 1); }
+.leaflet-zoom-anim .leaflet-tile, .leaflet-pan-anim .leaflet-tile { transition: none; }
+.leaflet-zoom-anim .leaflet-zoom-hide { visibility: hidden; }
+.leaflet-top, .leaflet-bottom { position: absolute; z-index: 1000; pointer-events: none; }
+.leaflet-top { top: 0; } .leaflet-right { right: 0; } .leaflet-bottom { bottom: 0; } .leaflet-left { left: 0; }
+.leaflet-control { position: relative; z-index: 800; pointer-events: auto; float: left; clear: both; }
+.leaflet-right .leaflet-control { float: right; }
+.leaflet-top .leaflet-control { margin-top: 10px; } .leaflet-bottom .leaflet-control { margin-bottom: 0; }
+.leaflet-left .leaflet-control { margin-left: 10px; } .leaflet-right .leaflet-control { margin-right: 0; }
+.leaflet-bar { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.leaflet-bar a { display: block; width: 34px; height: 34px; line-height: 34px; text-align: center; background: var(--surface); color: var(--ink); text-decoration: none; font-size: 18px; }
+.leaflet-bar a + a { border-top: 1px solid var(--line); }
+.leaflet-bar a.leaflet-disabled { color: var(--muted); cursor: default; }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--muted); font-size: 11px; padding: 1px 6px; border-top-left-radius: 6px; }
+.leaflet-control-attribution a { color: var(--muted); }
+.leaflet-popup { position: absolute; text-align: center; margin-bottom: 20px; }
+.leaflet-popup-content-wrapper { padding: 1px; text-align: left; border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 6px 24px rgba(0, 0, 0, .2); }
+.leaflet-popup-content { margin: 14px 16px; line-height: 1.35; }
+.leaflet-popup-tip-container { width: 40px; height: 20px; position: absolute; left: 50%; margin-top: -1px; margin-left: -20px; overflow: hidden; pointer-events: none; }
+.leaflet-popup-tip { width: 17px; height: 17px; padding: 1px; margin: -10px auto 0; transform: rotate(45deg); background: var(--surface); }
+.leaflet-container a.leaflet-popup-close-button { position: absolute; top: 4px; right: 6px; width: 24px; height: 24px; font: 18px/24px var(--body); color: var(--muted); text-decoration: none; text-align: center; }
+.leaflet-fade-anim .leaflet-popup { opacity: 1; transition: opacity .2s linear; }
+
 @media (min-width: 720px) {
   .sheet { left: 50%; right: auto; bottom: auto; top: 50%; transform: translate(-50%, -50%); width: min(640px, calc(100% - 48px)); max-height: 88vh; border-radius: 22px; }
   .sheet-top::before { visibility: hidden; }
@@ -288,12 +352,30 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 28px; }
           <button type="button" data-city="Other" aria-pressed="false">Rest of UK</button>
         </div>
         <div class="sort"><label for="sort">Sort</label>
-          <select id="sort"><option value="date">Soonest</option><option value="score">Top rated</option></select>
+          <select id="sort"><option value="date">Soonest</option><option value="score">Top rated</option><option value="near">Nearest</option></select>
         </div>
       </div>
 
-      <p class="demo"><b>Demo:</b> events, times and prices are real. Members, groups and attendance are examples.</p>
+      <div class="locbar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        <span id="loc-label" aria-live="polite">Set your location to see how far each event is</span>
+        <button type="button" class="btn sm people" id="loc-me">Use my location</button>
+        <label for="loc-area" class="sr">Or choose an area</label>
+        <select id="loc-area"><option value="">Or choose an area…</option></select>
+      </div>
+
+      <div class="row" style="justify-content:space-between">
+        <p class="demo"><b>Demo:</b> events, times and prices are real. Members, groups and attendance are examples.</p>
+        <div class="chips" role="group" aria-label="View">
+          <button type="button" data-view="list" aria-pressed="true">List</button>
+          <button type="button" data-view="map" aria-pressed="false">Map</button>
+        </div>
+      </div>
       <div id="list" aria-live="polite"></div>
+      <div class="mapwrap" id="mapwrap" hidden>
+        <div id="map" aria-label="Map of events"></div>
+        <p class="note" id="map-note" hidden></p>
+      </div>
     </section>
 
     <section class="view" id="view-people" aria-label="People" hidden>
@@ -359,6 +441,7 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 28px; }
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 const FACTORS = [
   { key: "net",  label: "Networking", def: 35 },
@@ -436,6 +519,28 @@ EVENTS.forEach((e, i) => {
   e.going = Array.from({ length: 4 + (i * 3) % 4 }, (_, k) => PEOPLE[(i * 2 + k * 5) % PEOPLE.length]);
 });
 
+// Venue coordinates from postcodes.io; 100 Minories (retired postcode) and Faces, Gants Hill placed by street.
+const LL = {
+  "The Bakery Session": [51.499148, -0.183969],
+  "Armenian Circle Dances | Edition 9": [51.498878, -0.193877],
+  "25th Anniversary Gala": [51.51238, -0.149156],
+  "British Armenian Chamber of Commerce Launch Reception": [51.5110, -0.0745],
+  "Concert: Celebration of Armenian Music": [51.501598, -0.155458],
+  "The Beauty of Priesthood: Fundraising Dinner": [51.497117, -0.194581],
+  "Hovig Live": [51.57655, 0.066341],
+  "Mother & Daughter Afternoon Tea": [51.500492, -0.315043],
+  "Echoes of the Past, Voices of the Present": [51.521807, -0.107619],
+  "Armenian History x Digital Humanities": [51.521807, -0.107619],
+  "Bones in the Desert": [51.513692, -0.04062],
+  "Armenia's House Museums on Screen": [51.521807, -0.107619],
+  "Hayashen Community Lunch Club": [51.505514, -0.277594],
+};
+EVENTS.forEach(e => { e.ll = LL[e.title]; });
+const AREAS = {
+  central: ["Central London", 51.5074, -0.1278], kensington: ["Kensington", 51.4991, -0.1938], city: ["the City of London", 51.5155, -0.0922],
+  ealing: ["Ealing", 51.5130, -0.3089], ilford: ["Ilford", 51.5590, 0.0741], manchester: ["Manchester", 53.4808, -2.2426],
+};
+
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
@@ -450,6 +555,12 @@ const indFilter = new Map();      // event id → industry chip in the sheet
 let pInd = "All", pStat = "All";  // People tab filters
 let composing = null;             // hello key being written: "eventId:Name" or "p:Name"
 let sheetId = null, lastOpener = null;
+let view = "list";
+// Where distances are measured from. A device location stays in memory only; a chosen area is remembered.
+let here = null;
+const savedArea = store.get("barev-area");
+if (savedArea && AREAS[savedArea]) here = { lat: AREAS[savedArea][1], lng: AREAS[savedArea][2], label: AREAS[savedArea][0], area: savedArea };
+let map = null, pins = null, meMarker = null;
 
 const TODAY = "2026-10-28";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -480,6 +591,13 @@ function score(e) {
 const rating = e => Math.round(score(e) / 2) / 10;   // 0–100 score → 0.0–5.0
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const lc = s => s.toLowerCase();
+function miles(a, b) {
+  const r = x => x * Math.PI / 180, dLat = r(b[0] - a[0]), dLng = r(b[1] - a[1]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dLng / 2) ** 2;
+  return 2 * 3958.8 * Math.asin(Math.sqrt(h));
+}
+const distOf = e => here && e.ll ? miles([here.lat, here.lng], e.ll) : null;
+const fmtMi = m => m < 10 ? `${m.toFixed(1)} mi` : `${Math.round(m)} mi`;
 const shareText = e => `${e.title}\n${fmtDate(e.date)}, ${e.time}\n${e.venue}\n${e.url}\n\nFound on Barev Events`;
 
 // Every word typed must appear somewhere in the event; accents and case are ignored.
@@ -533,15 +651,18 @@ function personRow(p, key, e, k, extra = "") {
 }
 
 /* Events view */
-function renderEvents() {
+function renderEvents(refit = true) {
   const sortBy = document.getElementById("sort").value;
   const query = document.getElementById("q").value.trim();
   const items = EVENTS
     .filter(e => city === "all" || (city === "Other" ? !["London", "Manchester"].includes(e.city) : e.city === city))
     .filter(e => matches(e, query))
-    .sort((a, b) => sortBy === "date" ? a.date.localeCompare(b.date) || rating(b) - rating(a) : rating(b) - rating(a) || a.date.localeCompare(b.date));
+    .sort((a, b) => sortBy === "date" ? a.date.localeCompare(b.date) || rating(b) - rating(a)
+      : sortBy === "near" ? (distOf(a) ?? Infinity) - (distOf(b) ?? Infinity) || a.date.localeCompare(b.date)
+      : rating(b) - rating(a) || a.date.localeCompare(b.date));
   const list = document.getElementById("list");
   const where = city === "all" ? "across the UK" : city === "Other" ? "in the rest of the UK" : `in ${city}`;
+  if (view === "map") { renderMap(items, refit); return; }
   if (!items.length) {
     list.innerHTML = query
       ? `<div class="empty"><strong>No events match “${esc(query)}” ${where}</strong>Try a shorter word, an organiser like AGBU, or a type of event like dance or dinner.</div>`
@@ -550,19 +671,20 @@ function renderEvents() {
   }
   const groups = [];
   items.forEach(e => {
-    const g = sortBy === "date" ? groupOf(e.date) : "Top rated";
+    const g = sortBy === "date" ? groupOf(e.date) : sortBy === "near" ? (here ? `Nearest to ${here.label}` : "Set your location to sort by distance") : "Top rated";
     if (!groups.length || groups.at(-1).name !== g) groups.push({ name: g, items: [] });
     groups.at(-1).items.push(e);
   });
   list.innerHTML = groups.map(g => `<section class="group"><h3>${g.name}</h3><ul class="events">${g.items.map(eventCard).join("")}</ul></section>`).join("");
 }
 function eventCard(e) {
+  const d = distOf(e);
   return `<li><button type="button" class="ev" data-open="${e.id}">
     ${tile(e.date)}
     <span class="ev-body">
       <span class="ev-title">${esc(e.title)}</span>
       <span class="ev-meta">${esc(e.time)} · ${esc(e.venue)}</span>
-      <span class="ev-facts"><span class="price">${esc(e.price.split(" · ")[0])}</span><span class="rate"><span class="star" aria-hidden="true">★</span> ${rating(e).toFixed(1)}<span class="sr"> out of 5</span></span></span>
+      <span class="ev-facts"><span class="price">${esc(e.price.split(" · ")[0])}</span><span class="rate"><span class="star" aria-hidden="true">★</span> ${rating(e).toFixed(1)}<span class="sr"> out of 5</span></span>${d != null ? `<span class="dist">${fmtMi(d)}</span>` : ""}</span>
       <span class="ev-people">${faces(e.going)}<span>${goingLine(e)}</span></span>
     </span>
     <svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5"/></svg>
@@ -583,7 +705,7 @@ function renderSheet() {
     <div class="sh-hero">${tile(e.date)}<div><p class="sh-org">${esc(e.org)}</p><h2 id="sheet-title">${esc(e.title)}</h2></div></div>
     <dl class="facts">
       <div><dt>When</dt><dd>${fmtLong(e.date)} · ${esc(e.time)}</dd></div>
-      <div><dt>Where</dt><dd>${esc(e.venue)}</dd></div>
+      <div><dt>Where</dt><dd>${esc(e.venue)}${distOf(e) != null ? ` · <span class="dist">${fmtMi(distOf(e))} away</span>` : ""}${e.ll ? `<br><a href="https://www.google.com/maps/dir/?api=1&destination=${e.ll.join(",")}" target="_blank" rel="noopener">Directions</a>` : ""}</dd></div>
       <div><dt>Price</dt><dd>${esc(e.price)}</dd></div>
     </dl>
     <div class="row">
@@ -613,7 +735,79 @@ function renderSheet() {
     </section>`;
   body.scrollTop = keep;
 }
+/* Map */
+function mapNote(text) { const n = document.getElementById("map-note"); n.textContent = text || ""; n.hidden = !text; }
+function ensureMap() {
+  if (map) return true;
+  if (typeof L === "undefined") { mapNote("The map couldn't load. Check your connection and try again."); return false; }
+  const root = document.documentElement.dataset.theme;
+  const dark = root === "dark" || (root !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  map = L.map("map", { scrollWheelZoom: false }).setView([51.507, -0.13], 11);
+  const tiles = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dark ? "dark_all" : "light_all"}/{z}/{x}/{y}{r}.png`, {
+    maxZoom: 19, subdomains: "abcd",
+    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+  }).addTo(map);
+  tiles.once("tileerror", () => mapNote("Street map images can't load in this preview. The pins still work, and the live site shows the full map."));
+  pins = L.layerGroup().addTo(map);
+  return true;
+}
+function renderMap(items, refit) {
+  if (!ensureMap()) return;
+  map.invalidateSize();
+  pins.clearLayers();
+  const byVenue = new Map();
+  items.filter(e => e.ll).forEach(e => { const k = e.ll.join(","); byVenue.has(k) ? byVenue.get(k).push(e) : byVenue.set(k, [e]); });
+  byVenue.forEach(evs => {
+    evs.sort((a, b) => a.date.localeCompare(b.date));
+    const first = evs[0], p = parts(first.date), d = distOf(first), venue = first.venue.split(",")[0];
+    const icon = L.divIcon({ className: "", iconSize: [40, 46], iconAnchor: [20, 46], popupAnchor: [0, -44],
+      html: `<div class="pin"><div class="b"><b>${p.d}</b><span>${MONTHS[p.m - 1].toUpperCase()}</span></div>${evs.length > 1 ? `<i>${evs.length}</i>` : ""}</div>` });
+    L.marker(first.ll, { icon, title: `${venue}: ${evs.length} event${evs.length > 1 ? "s" : ""}`, alt: venue }).addTo(pins).bindPopup(
+      `<div class="pop"><h4>${esc(venue)}${d != null ? ` · ${fmtMi(d)} away` : ""}</h4>${evs.map(e => `<div class="pop-ev">
+        <small>${fmtDate(e.date)} · ${esc(e.time)}</small><b>${esc(e.title)}</b>
+        <small>${esc(e.price.split(" · ")[0])} · ★ ${rating(e).toFixed(1)}</small>
+        <button type="button" class="btn sm people" data-open="${e.id}">See details</button></div>`).join("")}</div>`, { maxWidth: 260 });
+  });
+  if (meMarker) { meMarker.remove(); meMarker = null; }
+  if (here) meMarker = L.marker([here.lat, here.lng], { icon: L.divIcon({ className: "", iconSize: [18, 18], iconAnchor: [9, 9], html: '<div class="me-dot"></div>' }), interactive: false, keyboard: false, zIndexOffset: -100 }).addTo(map);
+  if (!items.length) mapNote(`No events to show ${city === "all" ? "" : city === "Other" ? "in the rest of the UK " : `in ${city} `}with these filters yet.`);
+  else if (document.getElementById("map-note").textContent.startsWith("No events")) mapNote("");
+  if (refit) {
+    const pts = items.filter(e => e.ll).map(e => e.ll);
+    if (here) pts.push([here.lat, here.lng]);
+    if (pts.length > 1) map.fitBounds(pts, { padding: [40, 40], maxZoom: 14 });
+    else if (pts.length) map.setView(pts[0], 13);
+  }
+}
+
+/* Location */
+function renderLocbar() {
+  document.getElementById("loc-label").innerHTML = here ? `Distances from <b>${esc(here.label)}</b>` : "Set your location to see how far each event is";
+  document.getElementById("loc-area").value = here && here.area ? here.area : "";
+}
+function setHere(next) {
+  here = next;
+  store.set("barev-area", here && here.area ? here.area : null);
+  renderLocbar(); renderEvents();
+  if (sheetId !== null) renderSheet();
+}
+document.getElementById("loc-area").innerHTML += Object.entries(AREAS).map(([k, a]) => `<option value="${k}">${a[0].replace(/^the /, "The ")}</option>`).join("");
+document.getElementById("loc-area").addEventListener("change", ev => {
+  const a = AREAS[ev.target.value];
+  setHere(a ? { lat: a[1], lng: a[2], label: a[0], area: ev.target.value } : null);
+});
+document.getElementById("loc-me").addEventListener("click", () => {
+  const label = document.getElementById("loc-label");
+  if (!navigator.geolocation) { label.textContent = "Your location isn't available here. Choose an area instead."; return; }
+  label.textContent = "Finding you…";
+  navigator.geolocation.getCurrentPosition(
+    pos => setHere({ lat: pos.coords.latitude, lng: pos.coords.longitude, label: "your location", area: "" }),
+    () => { label.textContent = "Couldn't get your location. Choose an area instead."; },
+    { timeout: 10000, maximumAge: 300000 });
+});
+
 function openSheet(id, opener) {
+  if (map) map.closePopup();
   sheetId = id; lastOpener = opener || null; composing = null;
   const s = document.getElementById("sheet");
   s.hidden = false; document.body.classList.add("locked");
@@ -695,7 +889,7 @@ function renderGreeting() {
     ? `<span class="hy" lang="hy">Բարեւ</span>, ${esc(profile.name)}`
     : `<span class="hy" lang="hy">Բարեւ</span> (barev), hello`;
 }
-function renderAll() { renderGreeting(); renderEvents(); renderPeople(); renderYou(); if (sheetId !== null) renderSheet(); }
+function renderAll() { renderGreeting(); renderEvents(false); renderPeople(); renderYou(); if (sheetId !== null) renderSheet(); }
 
 /* Tabs */
 const TABS = ["events", "people", "you"];
@@ -721,6 +915,13 @@ document.addEventListener("click", ev => {
   if (d.city) {
     city = d.city;
     document.querySelectorAll("[data-city]").forEach(x => x.setAttribute("aria-pressed", x === t));
+    return renderEvents();
+  }
+  if (d.view) {
+    view = d.view;
+    document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x === t));
+    document.getElementById("list").hidden = view === "map";
+    document.getElementById("mapwrap").hidden = view !== "map";
     return renderEvents();
   }
   if (d.ind) indFilter.set(sheetId, d.ind);
@@ -760,6 +961,7 @@ const q = document.getElementById("q"), qClear = document.getElementById("q-clea
 q.addEventListener("input", () => { qClear.hidden = !q.value; renderEvents(); });
 qClear.addEventListener("click", () => { q.value = ""; qClear.hidden = true; q.focus(); renderEvents(); });
 
+renderLocbar();
 renderAll();
 showTab(location.hash.slice(1) || "events", false);
 </script>
