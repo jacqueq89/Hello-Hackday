@@ -3,159 +3,360 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>body{margin:0}</style>
+<style>body{margin:0}[hidden]{display:none!important}</style>
 <title>Barev Events</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=Noto+Sans+Armenian:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Noto+Sans+Armenian:wght@600;700&display=swap">
 <style>
-/* Layout: one narrow column — header, controls, ranked event cards, then "coming next". */
+/* Layout: app shell. Header with brand + tabs (tabs become a bottom bar on phones); three views: Events, People, You.
+   Event cards are compact rows that open a detail sheet. Colour discipline: red = action, blue = people, orange = dates. */
 :root {
-  --bg: #f6f3f4;
+  --bg: #faf7f5;
   --surface: #ffffff;
-  --ink: #1e1a1c;
-  --muted: #6c6267;
-  --line: #e6dfe1;
-  --accent: #a3243b;      /* pomegranate */
-  --accent-soft: #f6e3e6;
-  --apricot: #c9761c;     /* flag orange, darkened for text */
-  --good: #2f7a4f;
-  --warn: #9a6400;
-  --low: #8a8085;
+  --surface-2: #f3eeeb;
+  --ink: #1f1a1c;
+  --muted: #6d6468;
+  --line: #ebe4e1;
+  /* Flag of Armenia, official web values: red D90012, blue 0033A0, orange F2A800 */
+  --red: #d90012;
+  --blue: #0033a0;
+  --orange: #f2a800;
+  --accent: var(--red);
+  --orange-ink: #94580a;   /* orange darkened for readable text */
+  --blue-soft: #e9eef9;
+  --red-soft: #fde8ea;
+  --hero: #fff0e2;         /* apricot */
+  --motif: #e9a03b;
+  --scrim: rgba(24, 12, 16, 0.5);
+  --shadow: 0 1px 2px rgba(40, 20, 25, .05), 0 8px 24px rgba(40, 20, 25, .06);
   --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --armenian: "Noto Sans Armenian", "Sylfaen", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #141113; --surface: #1e191b; --ink: #f2ecee; --muted: #a99da2; --line: #362e31;
-    --accent: #e8596f; --accent-soft: #3a1d24; --apricot: #f0a952; --good: #5cc28a; --warn: #e2b04a; --low: #8f8489;
+    --bg: #151214; --surface: #1f1a1d; --surface-2: #2a2427; --ink: #f3eef0; --muted: #aa9fa4; --line: #3a3236;
+    --red: #ff5a67; --blue: #8aa8ff; --orange: #f6b53a; --orange-ink: #f6b53a; --blue-soft: #1e2642; --red-soft: #3b1a1f;
+    --hero: #2b2019; --motif: #b9782a; --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #141113; --surface: #1e191b; --ink: #f2ecee; --muted: #a99da2; --line: #362e31;
-  --accent: #e8596f; --accent-soft: #3a1d24; --apricot: #f0a952; --good: #5cc28a; --warn: #e2b04a; --low: #8f8489;
+  --bg: #151214; --surface: #1f1a1d; --surface-2: #2a2427; --ink: #f3eef0; --muted: #aa9fa4; --line: #3a3236;
+  --red: #ff5a67; --blue: #8aa8ff; --orange: #f6b53a; --orange-ink: #f6b53a; --blue-soft: #1e2642; --red-soft: #3b1a1f;
+  --hero: #2b2019; --motif: #b9782a; --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
-  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 0 48px;
 }
-.wrap { max-width: 760px; margin: 0 auto; display: grid; gap: 24px; }
+body.locked { overflow: hidden; }
 a { color: var(--accent); }
-button, select, input { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button, select, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.app { max-width: 760px; margin: 0 auto; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-header { display: grid; gap: 6px; }
-.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.brand h1 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -0.02em; margin: 0; }
-.brand .hy { font-family: var(--armenian); color: var(--accent); font-size: 20px; }
-header p { margin: 0; color: var(--muted); max-width: 60ch; }
+/* Header + tabs */
+.stripe { height: 6px; border-radius: 0 0 3px 3px; background: linear-gradient(90deg, var(--red) 0 33.33%, var(--blue) 33.33% 66.67%, var(--orange) 66.67%); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.mark { width: 28px; height: 19px; border-radius: 3px; flex: none; background: linear-gradient(var(--red) 0 33.33%, var(--blue) 33.33% 66.67%, var(--orange) 66.67%); }
+.brand b { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.tabs button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; border-radius: 999px; padding: 7px 14px; cursor: pointer; color: var(--muted); font-weight: 500; font-size: 15px; }
+.tabs button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tabs button[aria-current="page"] { background: var(--ink); color: var(--bg); }
 
+/* Hero */
+.hero { position: relative; overflow: hidden; background: var(--hero); border-radius: 20px; padding: 28px 24px; display: grid; gap: 8px; }
+.hero::after { content: ""; position: absolute; inset: 0 0 0 40%; background: var(--motif); opacity: .45; pointer-events: none;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.6'%3E%3Cpath d='M22 3 41 22 22 41 3 22Z'/%3E%3Cpath d='M22 13 31 22 22 31 13 22Z'/%3E%3C/g%3E%3Cpath d='M22 19 25 22 22 25 19 22Z'/%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='44' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='44' r='2.5'/%3E%3Ccircle cx='44' cy='44' r='2.5'/%3E%3C/svg%3E"), linear-gradient(to left, #000 30%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.6'%3E%3Cpath d='M22 3 41 22 22 41 3 22Z'/%3E%3Cpath d='M22 13 31 22 22 31 13 22Z'/%3E%3C/g%3E%3Cpath d='M22 19 25 22 22 25 19 22Z'/%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='44' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='44' r='2.5'/%3E%3Ccircle cx='44' cy='44' r='2.5'/%3E%3C/svg%3E"), linear-gradient(to left, #000 30%, transparent);
+  mask-composite: intersect; }
+.hero > * { position: relative; z-index: 1; }
+.greet { margin: 0; font-weight: 600; color: var(--red); font-size: 17px; }
+.greet .hy { font-family: var(--armenian); font-weight: 700; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 6vw, 38px); line-height: 1.08; letter-spacing: -0.025em; margin: 0; max-width: 16ch; text-wrap: balance; }
+.hero p.lede { margin: 0; color: var(--muted); max-width: 46ch; }
+
+.view { display: grid; gap: 20px; padding-top: 4px; }
+.view-head h2 { font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: -0.02em; margin: 0; }
+.view-head p { margin: 4px 0 0; color: var(--muted); }
+.demo { font-size: 13px; color: var(--muted); margin: 0; }
+.demo b { color: var(--ink); font-weight: 600; }
+
+/* Search + filters */
+.search { position: relative; }
+.search input { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 12px 44px; font-size: 16px; box-shadow: var(--shadow); }
+.search input::placeholder { color: var(--muted); }
+.search input:focus { border-color: var(--blue); outline: none; }
+.search input::-webkit-search-cancel-button { display: none; }
+.search > svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.search .clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 22px; line-height: 1; padding: 4px 10px; border-radius: 999px; }
 .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); flex-wrap: wrap; }
-.seg button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; cursor: pointer; color: var(--muted); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
-.sort { display: flex; gap: 8px; align-items: center; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 14px; cursor: pointer; color: var(--muted); }
+.chips button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.sort { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 14px; }
 .sort select { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
 
-details.prefs { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-details.prefs summary { cursor: pointer; font-weight: 600; }
-details.prefs summary span { color: var(--muted); font-weight: 400; }
-.sliders { display: grid; gap: 12px; margin-top: 14px; }
-.slider { display: grid; grid-template-columns: 110px 1fr 36px; gap: 12px; align-items: center; }
-.slider label { font-weight: 500; }
-.slider output { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
-.slider input { accent-color: var(--accent); width: 100%; }
-.reset { margin-top: 10px; background: none; border: 0; color: var(--accent); cursor: pointer; padding: 0; text-decoration: underline; }
-
-.count { color: var(--muted); font-size: 13px; margin: 0; }
-.list { display: grid; gap: 12px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; grid-template-columns: 64px 1fr; gap: 16px; }
-.score { display: grid; justify-items: center; align-content: start; gap: 4px; }
-.score b { font-family: var(--display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
-.score small { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; text-align: center; }
-.score.high b, .score.high small { color: var(--good); }
-.score.mid b, .score.mid small { color: var(--warn); }
-.score.low b, .score.low small { color: var(--low); }
-.body { min-width: 0; display: grid; gap: 8px; }
-.meta { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
-.meta .when { color: var(--apricot); font-weight: 600; }
-.card h2 { font-family: var(--display); font-weight: 500; font-size: 19px; line-height: 1.25; margin: 0; text-wrap: balance; }
-.reason { margin: 0; }
-.flag { font-size: 12px; color: var(--warn); }
-.bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.bar { display: grid; gap: 3px; font-size: 11px; color: var(--muted); }
-.bar i { display: block; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
-.bar i::after { content: ""; display: block; height: 100%; width: var(--v); background: var(--accent); border-radius: 3px; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); text-decoration: none; color: var(--ink); font-size: 14px; cursor: pointer; }
-.btn.wa { background: var(--accent); border-color: var(--accent); color: #fff; }
-.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; color: var(--muted); }
+/* Event list */
+.group { display: grid; gap: 10px; }
+.group h3 { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .02em; text-transform: uppercase; color: var(--muted); margin: 8px 0 0; }
+.events { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ev { width: 100%; text-align: left; display: grid; grid-template-columns: 64px minmax(0, 1fr) 20px; gap: 14px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; cursor: pointer; box-shadow: var(--shadow); }
+.ev:hover { border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); }
+.tile { display: grid; justify-items: center; align-content: center; gap: 0; background: var(--hero); border-radius: 12px; padding: 8px 4px; line-height: 1.05; }
+.tile .dow, .tile .mon { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--orange-ink); }
+.tile .day { font-family: var(--display); font-weight: 800; font-size: 26px; color: var(--ink); }
+.ev-body { display: grid; gap: 4px; min-width: 0; }
+.ev-title { font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1.2; text-wrap: balance; }
+.ev-meta { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev-facts { display: flex; gap: 12px; font-size: 14px; align-items: center; flex-wrap: wrap; }
+.price { font-weight: 600; font-variant-numeric: tabular-nums; }
+.rate { color: var(--muted); font-variant-numeric: tabular-nums; }
+.rate .star { color: var(--orange); }
+.ev-people { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--blue); margin-top: 2px; }
+.ev-people b { font-weight: 600; }
+.faces { display: inline-flex; flex: none; }
+.faces span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; border: 2px solid var(--surface); margin-left: -6px; }
+.faces span:first-child { margin-left: 0; }
+.chev { width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.c0 { background: var(--red); } .c1 { background: var(--blue); } .c2 { background: var(--orange-ink); }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 16px; padding: 24px; text-align: center; color: var(--muted); }
 .empty strong { color: var(--ink); display: block; margin-bottom: 4px; }
 
-.next { display: grid; gap: 12px; }
-.next h3 { font-family: var(--display); font-weight: 700; font-size: 22px; margin: 0; }
-.next ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.next li { background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; }
-.next li b { display: block; margin-bottom: 2px; }
-.next li span { color: var(--muted); font-size: 14px; }
-footer { color: var(--muted); font-size: 12px; }
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); text-decoration: none; color: var(--ink); font-size: 15px; font-weight: 500; cursor: pointer; }
+.btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.people { border-color: var(--blue); color: var(--blue); }
+.btn.people.solid { background: var(--blue); color: #fff; }
+.btn.sm { padding: 6px 12px; font-size: 14px; }
+.linkish { background: none; border: 0; padding: 0; color: var(--blue); text-decoration: underline; cursor: pointer; font-size: 14px; }
 
-@media (max-width: 560px) {
-  .card { grid-template-columns: 1fr; }
-  .score { grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
-  .bars { grid-template-columns: repeat(3, 1fr); }
-  .next ul { grid-template-columns: 1fr; }
-  .slider { grid-template-columns: 96px 1fr 32px; }
+/* People rows (sheet + People tab) */
+.people { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.person { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 6px 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.person:last-child { border-bottom: 0; }
+.av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; }
+.who { min-width: 0; display: grid; gap: 2px; font-size: 15px; }
+.who b { font-weight: 600; }
+.who small { color: var(--muted); font-size: 13.5px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: var(--ink); background: var(--surface-2); border-radius: 999px; padding: 2px 10px 2px 8px; justify-self: start; white-space: nowrap; }
+.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+.status.advice::before { background: var(--orange); }
+.status.work::before { background: var(--red); }
+.goes { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.goes button { border: 0; background: var(--blue-soft); color: var(--blue); border-radius: 999px; padding: 2px 10px; font-size: 13px; cursor: pointer; }
+.compose { grid-column: 2 / -1; display: grid; gap: 8px; }
+.compose label { font-size: 13px; color: var(--muted); }
+.compose textarea { width: 100%; min-height: 92px; resize: vertical; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14.5px; line-height: 1.45; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.sent { grid-column: 2 / -1; color: var(--blue); font-size: 13.5px; margin: 0; }
+.tick { color: var(--blue); font-size: 14px; font-weight: 500; white-space: nowrap; }
+
+/* Panels (You tab) */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 12px; box-shadow: var(--shadow); }
+.panel h3 { font-family: var(--display); font-weight: 700; font-size: 20px; margin: 0; }
+.panel > p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.pf-grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 500; }
+.pf-grid input, .pf-grid select { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; color: var(--ink); font-size: 16px; width: 100%; }
+.pf-card { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: center; }
+.pf-card .av { width: 56px; height: 56px; font-size: 22px; }
+.form-err { color: var(--red); font-size: 13.5px; margin: 0; }
+.mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mini li { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: 15px; flex-wrap: wrap; }
+.mini small { color: var(--muted); font-size: 13.5px; }
+.q { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
+.q legend { font-weight: 600; padding: 0; margin-bottom: 8px; }
+.choice { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice label { border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 14px; position: relative; }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+.choice label:has(input:checked) { background: var(--red); border-color: var(--red); color: #fff; }
+.choice label:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 2px; }
+.stack { display: grid; gap: 16px; }
+.thanks { color: var(--blue); font-weight: 500; margin: 0; }
+.next ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.next li { background: var(--red-soft); border-radius: 12px; padding: 12px 14px; font-size: 14px; color: var(--muted); }
+.next li b { display: block; color: var(--ink); margin-bottom: 2px; font-size: 15px; }
+footer { color: var(--muted); font-size: 12.5px; margin-top: 28px; }
+
+/* Event sheet */
+.backdrop { position: fixed; inset: 0; background: var(--scrim); z-index: 50; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: calc(100% - 24px - env(safe-area-inset-top, 0px)); background: var(--bg);
+  border-radius: 22px 22px 0 0; display: flex; flex-direction: column; overflow: hidden; }
+.sheet-top { display: flex; justify-content: center; position: relative; padding: 8px 0 0; }
+.sheet-top::before { content: ""; width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin-top: 2px; }
+.close { position: absolute; right: max(12px, env(safe-area-inset-right, 0px)); top: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--surface-2); cursor: pointer; display: grid; place-items: center; }
+.close svg { width: 16px; height: 16px; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; fill: none; }
+.sheet-scroll { overflow-y: auto; min-height: 0; padding: 12px max(20px, env(safe-area-inset-right, 0px)) max(28px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); display: grid; gap: 20px; }
+.sh-hero { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 16px; align-items: center; padding-right: 36px; }
+.sh-hero .tile { padding: 10px 4px; }
+.sh-hero .tile .day { font-size: 32px; }
+.sh-org { margin: 0; color: var(--muted); font-size: 14px; }
+.sh-hero h2 { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.12; letter-spacing: -0.02em; margin: 2px 0 0; text-wrap: balance; }
+.facts { margin: 0; display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.facts div { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; }
+.facts dt { color: var(--muted); font-size: 14px; }
+.facts dd { margin: 0; font-size: 15px; }
+.sh-sec { display: grid; gap: 10px; }
+.sh-sec h3 { font-family: var(--display); font-weight: 700; font-size: 19px; margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sh-sec h3 small { font-family: var(--body); font-weight: 400; font-size: 13.5px; color: var(--muted); }
+.sh-sec > p { margin: 0; }
+.note { font-size: 13.5px; color: var(--muted); }
+.people-line { color: var(--blue); font-size: 15px; }
+.crowd { color: var(--blue); font-size: 14px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 16px; }
+.bars { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.bar { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+.bar i { display: block; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bar i::after { content: ""; display: block; height: 100%; width: var(--v); background: var(--orange); border-radius: 3px; }
+.big-rate { font-family: var(--display); font-weight: 800; font-size: 22px; }
+.big-rate .star { color: var(--orange); }
+
+@media (min-width: 720px) {
+  .sheet { left: 50%; right: auto; bottom: auto; top: 50%; transform: translate(-50%, -50%); width: min(640px, calc(100% - 48px)); max-height: 88vh; border-radius: 22px; }
+  .sheet-top::before { visibility: hidden; }
 }
-@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } .card:hover { border-color: var(--muted); } }
+@media (max-width: 719px) {
+  body { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; border-radius: 0; border-width: 1px 0 0; justify-content: space-around;
+    padding: 6px max(12px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+  .tabs button { flex-direction: column; gap: 2px; font-size: 12px; padding: 6px 18px; border-radius: 12px; }
+  .tabs button svg { width: 22px; height: 22px; }
+  .tabs button[aria-current="page"] { background: none; color: var(--red); }
+  .hero { padding: 22px 18px; }
+  .pf-grid, .next ul { grid-template-columns: 1fr; }
+  .bars { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .person { grid-template-columns: 40px minmax(0, 1fr); }
+  .person > .btn, .person > .tick { grid-column: 2; justify-self: start; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .backdrop:not([hidden]) { animation: fade .18s ease-out; }
+  .backdrop:not([hidden]) .sheet { animation: up .24s cubic-bezier(.2, .8, .2, 1); }
+  @media (min-width: 720px) { .backdrop:not([hidden]) .sheet { animation: pop .2s ease-out; } }
+  .ev { transition: border-color .15s, transform .15s; }
+  .ev:active { transform: scale(.99); }
+}
+@keyframes fade { from { opacity: 0; } }
+@keyframes up { from { transform: translateY(40px); opacity: .6; } }
+@keyframes pop { from { transform: translate(-50%, -48%); opacity: 0; } }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <div class="brand"><h1>Barev Events</h1><span class="hy" lang="hy">Բարեւ</span></div>
-    <p>Every Armenian event in the UK in one place, ranked by how much it's worth going for you: time to meet people first, Armenian culture close behind.</p>
+<div class="app">
+  <div class="stripe" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><b>Barev Events</b></div>
+    <nav class="tabs" aria-label="Sections">
+      <button type="button" data-tab="events" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Events</button>
+      <button type="button" data-tab="people"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M17 14.5c2.5 0 4.2 1.6 4.6 4.5"/></svg>People</button>
+      <button type="button" data-tab="you"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6"/></svg>You</button>
+    </nav>
   </header>
 
-  <div class="controls">
-    <div class="seg" role="group" aria-label="City">
-      <button type="button" data-city="all" aria-pressed="true">All UK</button>
-      <button type="button" data-city="London" aria-pressed="false">London</button>
-      <button type="button" data-city="Manchester" aria-pressed="false">Manchester</button>
-      <button type="button" data-city="Other" aria-pressed="false">Rest of UK</button>
-    </div>
-    <div class="sort"><label for="sort">Sort</label>
-      <select id="sort"><option value="score">Best match</option><option value="date">Soonest</option></select>
-    </div>
+  <main>
+    <section class="view" id="view-events" aria-label="Events">
+      <div class="hero">
+        <p class="greet" id="greet"><span class="hy" lang="hy">Բարեւ</span> (barev), hello</p>
+        <h1>What's on for Armenians in the UK</h1>
+        <p class="lede">See who's going, say hello before you arrive, and never walk in alone.</p>
+      </div>
+
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <label for="q" class="sr">Search events</label>
+        <input type="search" id="q" placeholder="Search events, organisers or places" autocomplete="off">
+        <button type="button" class="clear" id="q-clear" aria-label="Clear search" hidden>×</button>
+      </div>
+
+      <div class="controls">
+        <div class="chips" role="group" aria-label="City">
+          <button type="button" data-city="all" aria-pressed="true">All UK</button>
+          <button type="button" data-city="London" aria-pressed="false">London</button>
+          <button type="button" data-city="Manchester" aria-pressed="false">Manchester</button>
+          <button type="button" data-city="Other" aria-pressed="false">Rest of UK</button>
+        </div>
+        <div class="sort"><label for="sort">Sort</label>
+          <select id="sort"><option value="date">Soonest</option><option value="score">Top rated</option></select>
+        </div>
+      </div>
+
+      <p class="demo"><b>Demo:</b> events, times and prices are real. Members, groups and attendance are examples.</p>
+      <div id="list" aria-live="polite"></div>
+    </section>
+
+    <section class="view" id="view-people" aria-label="People" hidden>
+      <div class="view-head">
+        <h2>People</h2>
+        <p>Armenians in the UK who've chosen to show their profile. Find someone in your field and say hello.</p>
+      </div>
+      <div class="chips" role="group" aria-label="Filter by industry" id="p-ind"></div>
+      <div class="chips" role="group" aria-label="Filter by status" id="p-stat"></div>
+      <p class="demo"><b>Demo:</b> these members are invented examples.</p>
+      <div class="box"><ul class="people" id="people-list"></ul></div>
+    </section>
+
+    <section class="view" id="view-you" aria-label="You" hidden>
+      <div class="view-head"><h2>You</h2><p>Your profile, the people you've said hello to, and the groups you've joined.</p></div>
+      <section class="panel" id="profile" aria-labelledby="pf-h"></section>
+      <section class="panel" aria-labelledby="hellos-h"><h3 id="hellos-h">Your hellos</h3><div id="hellos"></div></section>
+      <section class="panel" aria-labelledby="groups-h"><h3 id="groups-h">Your groups</h3><div id="groups"></div></section>
+
+      <section class="panel" aria-labelledby="rate-h">
+        <h3 id="rate-h">How was it?</h3>
+        <p>You checked in at the St Sarkis Festival on Sun 24 May (example). Three quick answers help the next person decide.</p>
+        <form id="rate-form" class="stack">
+          <fieldset class="q"><legend>Did you meet new people?</legend><div class="choice">
+            <label><input type="radio" name="met" value="3" id="met-3">Lots</label>
+            <label><input type="radio" name="met" value="2" id="met-2">A few</label>
+            <label><input type="radio" name="met" value="1" id="met-1">Not really</label>
+          </div></fieldset>
+          <fieldset class="q"><legend>Was there Armenian music or food?</legend><div class="choice">
+            <label><input type="radio" name="cult" value="3" id="cult-3">Both</label>
+            <label><input type="radio" name="cult" value="2" id="cult-2">One of them</label>
+            <label><input type="radio" name="cult" value="1" id="cult-1">Neither</label>
+          </div></fieldset>
+          <fieldset class="q"><legend>Who was there?</legend><div class="choice">
+            <label><input type="radio" name="age" value="mine" id="age-mine">Mostly my age</label>
+            <label><input type="radio" name="age" value="mixed" id="age-mixed">A real mix</label>
+            <label><input type="radio" name="age" value="other" id="age-other">Mostly older or younger</label>
+          </div></fieldset>
+          <div class="row"><button type="submit" class="btn primary" id="rate-submit">Send answers</button></div>
+        </form>
+        <p class="thanks" id="rate-thanks" hidden>Thanks. Your answers now count towards St Sarkis's next events.</p>
+      </section>
+
+      <section class="panel next" aria-labelledby="next-h">
+        <h3 id="next-h">Coming soon</h3>
+        <ul>
+          <li><b>People you've met</b>Check in with a QR code and the app remembers who you met.</li>
+          <li><b>Mentoring matches</b>A monthly coffee with an Armenian further along in your field.</li>
+          <li><b>Barev Tables</b>Small dinners for 6 at Jakob's and other Armenian restaurants.</li>
+          <li><b>Organiser insights</b>AGBU, St Sarkis and others see who came and how it was rated.</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <footer>Events gathered on 28 October 2026 from Armenopole, the Armenian Institute, the Armenian Church Diocese of the UK &amp; Ireland, CAIA and Eventbrite. Prices checked the same day from Eventbrite and organisers' booking pages; Eventbrite prices include its booking fee. Always check the original listing before you go.</footer>
+</div>
+
+<div class="backdrop" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-top"><button type="button" class="close" data-close="1" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
+    <div class="sheet-scroll" id="sheet-body"></div>
   </div>
-
-  <details class="prefs" id="prefs">
-    <summary>What matters to you <span>· adjust and the ranking updates</span></summary>
-    <div class="sliders" id="sliders"></div>
-    <button type="button" class="reset" id="reset">Reset to defaults</button>
-  </details>
-
-  <p class="count" id="count"></p>
-  <div class="list" id="list"></div>
-
-  <section class="next">
-    <h3>Coming next</h3>
-    <ul>
-      <li><b>People you've met</b><span>Scan a QR code at an event to connect, without swapping Instagram.</span></li>
-      <li><b>Who's going</b><span>"3 people you met at the Bakery Session are going to this."</span></li>
-      <li><b>Weekly digest</b><span>Your top matches by email or WhatsApp, for people who aren't on social media.</span></li>
-      <li><b>Organiser submissions</b><span>AGBU, St Sarkis, Jakob's and others add events with format, food and music details.</span></li>
-    </ul>
-  </section>
-
-  <footer>Events gathered on 28 October 2026 from Armenopole, the Armenian Institute, the Armenian Church Diocese of the UK &amp; Ireland, CAIA and Eventbrite. Scores are a demo of the Worth It rubric. Always check the original listing before you go.</footer>
 </div>
 
 <script>
@@ -169,141 +370,398 @@ const FACTORS = [
 
 // Factor scores are 0–10. Sources: organiser and listing pages linked in `url`.
 const EVENTS = [
-  { title: "The Bakery Session", org: "AGBU YP London with Ararat House", date: "2026-11-08", time: "3:00 pm", venue: "Jakob's, 20 Gloucester Road, SW7", city: "London", price: "Drink included · price on listing",
-    reason: "AGBU YP afternoon at Jakob's with DJ Sevana Tchak and a drink included. Made for your age group and for mingling.",
-    f: { net: 9, cult: 7, ppl: 10, prac: 7, rep: 8 }, url: "https://www.eventbrite.co.uk/e/agbu-yp-london-bakery-session-tickets-2003545014071" },
-  { title: "Armenian Circle Dances | Edition 9", org: "AGBU London", date: "2026-11-07", time: "4:00–5:00 pm", venue: "Nevart Gulbenkian Hall, 20 Iverna Gardens, W8", city: "London", price: "Price on listing",
-    reason: "Learn Armenian circle dances. No experience needed, and the organisers invite you to make new friends. Only an hour long.",
-    f: { net: 8, cult: 10, ppl: 7, prac: 7, rep: 8 }, url: "https://www.eventbrite.co.uk/e/armenian-circle-dances-edition-9-tickets-2003381489966" },
-  { title: "25th Anniversary Gala", org: "Armenian Institute", date: "2026-11-06", time: "6:30–10:00 pm", venue: "Savile Club, 69 Brook Street, W1K", city: "London", price: "Price not listed",
-    reason: "Three and a half hours with dinner and live music from ArNor Duo: plenty of time to meet people. Formal, and the price isn't listed.",
-    f: { net: 8, cult: 8, ppl: 6, prac: 4, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/25th-anniversary-gala", flag: "Price not listed" },
+  { title: "The Bakery Session", org: "AGBU YP London with Ararat House", date: "2026-11-08", time: "3:00–6:00 pm", venue: "Jakob's, 20 Gloucester Road, SW7", city: "London", price: "£27.80 · drink included",
+    reason: "AGBU YP afternoon at Jakob's with DJ Sevana Tchak and a drink included. Made for young professionals and for mingling.",
+    f: { net: 9, cult: 7, ppl: 10, prac: 7, rep: 8 }, crowd: { past: "past YP London socials", n: 23 }, url: "https://www.eventbrite.co.uk/e/agbu-yp-london-bakery-session-tickets-2003545014071" },
+  { title: "Armenian Circle Dances | Edition 9", org: "AGBU London", date: "2026-11-07", time: "4:00–6:00 pm", venue: "Nevart Gulbenkian Hall, 20 Iverna Gardens, W8", city: "London", price: "Free–£15",
+    reason: "Learn Armenian circle dances. No experience needed, and the organisers invite you to make new friends.",
+    f: { net: 8, cult: 10, ppl: 7, prac: 7, rep: 8 }, crowd: { past: "previous dance workshops", n: 15 }, url: "https://www.eventbrite.co.uk/e/armenian-circle-dances-edition-9-tickets-2003381489966" },
+  { title: "25th Anniversary Gala", org: "Armenian Institute", date: "2026-11-06", time: "6:30–10:00 pm", venue: "Savile Club, 69 Brook Street, W1K", city: "London", price: "£150",
+    reason: "Three and a half hours with dinner and live music from ArNor Duo: plenty of time to meet people. Formal, and £150 a head.",
+    f: { net: 8, cult: 8, ppl: 6, prac: 3, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/25th-anniversary-gala" },
   { title: "British Armenian Chamber of Commerce Launch Reception", org: "British Armenian Chamber of Commerce", date: "2026-10-29", time: "6:30–7:30 pm", venue: "Tower Suites by Blue Orchid, 100 Minories, EC3N", city: "London", price: "£30",
     reason: "Built for networking, with drinks and canapés among Armenian business people. Short, and light on culture.",
     f: { net: 9, cult: 4, ppl: 7, prac: 6, rep: 5 }, url: "https://armenopole.com/british-armenian-chamber-of-commerce-official-launch-reception.html" },
   { title: "Concert: Celebration of Armenian Music", org: "Klingen Choir & Cultural Association", date: "2026-11-15", time: "7:00 pm", venue: "St Paul's Knightsbridge, 32a Wilton Place, SW1X", city: "London", price: "£15–£20",
     reason: "Orchestra and choir perform Babajanian and Spendiaryan for 35 years of independence. Free refreshments at the interval, but mostly listening.",
-    f: { net: 3, cult: 10, ppl: 5, prac: 8, rep: 7 }, url: "https://www.eventbrite.co.uk/e/concert-in-london-celebration-of-armenian-music-tickets-2003122614663" },
-  { title: "The Beauty of Priesthood: Fundraising Dinner", org: "Armenian Church Diocese of the UK & Ireland", date: "2026-11-21", time: "Time not listed", venue: "Venue not listed", city: "London", price: "Price not listed",
-    reason: "A dinner should be good for meeting people, but the listing has no time, venue or price yet.",
-    f: { net: 7, cult: 6, ppl: 4, prac: 2, rep: 7 }, url: "https://www.armenianchurch.org.uk/events/the-beauty-of-priesthood-fundraising-dinner", flag: "Missing time, venue and price" },
-  { title: "Hovig Live", org: "Xamos Live with CWF Events", date: "2026-10-30", time: "9:00 pm", venue: "Faces Night Club, Gants Hill", city: "London", price: "Price not listed",
+    f: { net: 3, cult: 10, ppl: 5, prac: 8, rep: 7 }, crowd: { past: "past Klingen concerts", n: 9 }, url: "https://www.eventbrite.co.uk/e/concert-in-london-celebration-of-armenian-music-tickets-2003122614663" },
+  { title: "The Beauty of Priesthood: Fundraising Dinner", org: "Armenian Church Diocese of the UK & Ireland", date: "2026-11-21", time: "6:30 pm", venue: "The Rock, St Mark Coptic Orthodox Church, Allen Street, W8", city: "London", price: "£100 · students £60",
+    reason: "A fundraising dinner for the Diocese's new recording studio. Good for meeting people, but £100 a head.",
+    f: { net: 7, cult: 6, ppl: 4, prac: 3, rep: 7 }, url: "https://www.armenianchurch.org.uk/events/the-beauty-of-priesthood-fundraising-dinner" },
+  { title: "Hovig Live", org: "Xamos Live with CWF Events", date: "2026-10-30", time: "9:00 pm–2:00 am", venue: "Faces Night Club, Gants Hill", city: "London", price: "From £38.62",
     reason: "A big night out with live music, but a concert leaves little time to talk. Far from central London.",
-    f: { net: 5, cult: 8, ppl: 7, prac: 4, rep: 6 }, url: "https://armenopole.com/hovig-live.html", flag: "Price not listed" },
-  { title: "Mother & Daughter Afternoon Tea", org: "Organiser not named", date: "2026-11-21", time: "5:00 pm", venue: "Navassartian Centre, 223 Northfield Avenue, W13", city: "London", price: "£30 (adults)",
+    f: { net: 5, cult: 8, ppl: 7, prac: 4, rep: 6 }, url: "https://www.eventbrite.co.uk/e/hovig-live-in-london-tickets-2000016629578" },
+  { title: "Mother & Daughter Afternoon Tea", org: "Organiser not named", date: "2026-11-21", time: "5:00 pm", venue: "Navassartian Centre, 223 Northfield Avenue, W13", city: "London", price: "£30 · ages 3–12 £15",
     reason: "A social afternoon tea with Prosecco, but aimed at mothers and daughters, and the organiser isn't named.",
     f: { net: 6, cult: 4, ppl: 4, prac: 5, rep: 4 }, url: "https://armenopole.com/mother-daughter-afternoon-tea.html" },
-  { title: "Echoes of the Past, Voices of the Present", org: "Armenian Institute", date: "2026-11-12", time: "6:30–8:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Book on Eventbrite",
+  { title: "Echoes of the Past, Voices of the Present", org: "Armenian Institute", date: "2026-11-12", time: "6:30–8:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "£4–£8",
     reason: "Talk and readings with Maureen Freely, Andrew Finkel and Tamara Wilson. Interesting, but mostly listening.",
     f: { net: 3, cult: 7, ppl: 5, prac: 7, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/echoes-of-the-past-voices-of-the-present" },
-  { title: "Armenian History x Digital Humanities", org: "Armenian Institute", date: "2026-12-03", time: "7:30–9:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Book on Eventbrite",
+  { title: "Armenian History x Digital Humanities", org: "Armenian Institute", date: "2026-12-03", time: "7:30–9:30 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Free–£8",
     reason: "Panel on games, playable archives and digital storytelling. Mostly listening.",
     f: { net: 3, cult: 6, ppl: 6, prac: 7, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/armenian-history-x-digital-humanities-immersive-worlds-playable-archives-and-experimental-storytelling-platforms" },
-  { title: "Bones in the Desert", org: "Armenian Institute (co-host)", date: "2026-11-14", time: "7:00–9:00 pm", venue: "Half Moon Young People's Theatre, E1", city: "London", price: "Price on listing",
+  { title: "Bones in the Desert", org: "Armenian Institute (co-host)", date: "2026-11-14", time: "7:00–9:00 pm", venue: "Half Moon Young People's Theatre, E1", city: "London", price: "£9 · supporter £12.50",
     reason: "Theatre performance followed by a discussion with writer Joe Nerssessian. Mostly sitting and watching.",
     f: { net: 3, cult: 7, ppl: 5, prac: 5, rep: 7 }, url: "https://www.armenianinstitute.org.uk/events/bones-in-the-desert-performance-and-discussion-with-writer-joe-nerssessian-" },
-  { title: "Armenia's House Museums on Screen", org: "Armenian Institute", date: "2026-11-19", time: "6:30–8:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "Book on Eventbrite",
+  { title: "Armenia's House Museums on Screen", org: "Armenian Institute", date: "2026-11-19", time: "6:30–8:00 pm", venue: "Armenian Institute, 1 Onslow Street, EC1N", city: "London", price: "£4–£8",
     reason: "Short films on Parajanov, Charents and Aguletsi with the director. A screening, so an easy skip if you want to meet people.",
     f: { net: 2, cult: 7, ppl: 5, prac: 7, rep: 8 }, url: "https://www.armenianinstitute.org.uk/events/armenias-house-museums-on-screen-parajanov-charents-and-aguletsi-short-films-screening-with-their-producer-christopher-atamian" },
-  { title: "Hayashen Community Lunch Club", org: "Centre for Armenian Information and Advice", date: "2026-10-30", time: "Fridays, 12:00–4:00 pm", venue: "Hayashen, 105a Mill Hill Road, W3", city: "London", price: "Free",
-    reason: "Weekly hot lunch with chess, cards and bingo, but aimed at people aged 50 and over.",
+  { title: "Hayashen Community Lunch Club", org: "Centre for Armenian Information and Advice", date: "2026-10-30", time: "Fridays, 12:00–4:00 pm", venue: "Hayashen, 105a Mill Hill Road, W3", city: "London", price: "Free · lunch by donation",
+    reason: "Weekly hot lunch with chess, cards and bingo, aimed at people aged 50 and over.",
     f: { net: 6, cult: 6, ppl: 1, prac: 9, rep: 7 }, url: "https://caia.org.uk/community-lunch-club/" },
 ];
+
+// Example people for the demo. Invented, not real attendees.
+const PEOPLE = [
+  { name: "Ani", age: 28, from: "Moved from Yerevan last year", likes: "dancing", industry: "Finance", title: "Financial Analyst", status: "advice" },
+  { name: "Narek", age: 31, from: "Born in London", likes: "live music", industry: "Finance", title: "Investment Banking Associate", status: "helping" },
+  { name: "Lilit", age: 26, from: "New to London", likes: "Armenian food", industry: "Tech", title: "Junior Software Engineer", status: "work" },
+  { name: "Aram", age: 35, from: "Moved from Beirut", likes: "meeting people in business", industry: "Law", title: "Commercial Solicitor", status: "helping" },
+  { name: "Sona", age: 29, from: "Born in Manchester", likes: "dancing", industry: "Healthcare", title: "Junior Doctor", status: "helping" },
+  { name: "Davit", age: 33, from: "New to London", likes: "live music", industry: "Tech", title: "Product Manager", status: "helping" },
+  { name: "Mariam", age: 40, from: "Born in London", likes: "Armenian food", industry: "Finance", title: "Head of Risk", status: "helping" },
+  { name: "Hayk", age: 27, from: "Moved from Tehran", likes: "meeting new people", industry: "Engineering", title: "Civil Engineer", status: "work" },
+  { name: "Tamar", age: 30, from: "Born in London", likes: "live music", industry: "Creative", title: "Graphic Designer", status: "work" },
+  { name: "Vahe", age: 38, from: "Moved from Aleppo", likes: "Armenian food", industry: "Law", title: "Barrister", status: "helping" },
+  { name: "Nare", age: 24, from: "New to London", likes: "dancing", industry: "Finance", title: "Accounting Graduate", status: "work" },
+  { name: "Garo", age: 34, from: "Born in Birmingham", likes: "meeting new people", industry: "Hospitality", title: "Restaurant Manager", status: "advice" },
+];
+const STATUS = { helping: "Open to helping", advice: "Looking for advice", work: "Open to work" };
+const INDUSTRIES = ["Finance", "Tech", "Law", "Healthcare", "Engineering", "Creative", "Hospitality", "Other"];
+EVENTS.forEach((e, i) => {
+  e.id = i;
+  e.solo = e.f.ppl >= 3 ? 3 + (i * 5) % 8 : 0;   // people going alone (example)
+  e.group = [0, 1, 2].map(k => PEOPLE[(i * 3 + k) % PEOPLE.length]);
+  // Members going who chose to show their profile (example). Step 5 over 12 people never repeats.
+  e.going = Array.from({ length: 4 + (i * 3) % 4 }, (_, k) => PEOPLE[(i * 2 + k * 5) % PEOPLE.length]);
+});
 
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
-const defaults = () => Object.fromEntries(FACTORS.map(f => [f.key, f.def]));
-let weights = { ...defaults(), ...(store.get("barev-weights") || {}) };
+const weights = Object.fromEntries(FACTORS.map(f => [f.key, f.def]));
 let city = "all";
+let profile = store.get("barev-profile");
+let editingProfile = !profile;
+const joined = new Set(store.get("barev-joined") || []);
+const sent = new Set(store.get("barev-sent") || []);
+const indFilter = new Map();      // event id → industry chip in the sheet
+let pInd = "All", pStat = "All";  // People tab filters
+let composing = null;             // hello key being written: "eventId:Name" or "p:Name"
+let sheetId = null, lastOpener = null;
 
+const TODAY = "2026-10-28";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-function fmtDate(iso) {
+const DAYS_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+function parts(iso) {
   const [y, m, d] = iso.split("-").map(Number);
-  return `${DAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]} ${d} ${MONTHS[m - 1]}`;
+  return { m, d, wd: new Date(Date.UTC(y, m - 1, d)).getUTCDay() };
+}
+const fmtDate = iso => { const p = parts(iso); return `${DAYS[p.wd]} ${p.d} ${MONTHS[p.m - 1]}`; };
+const fmtLong = iso => { const p = parts(iso); return `${DAYS_LONG[p.wd]} ${p.d} ${MONTHS_LONG[p.m - 1]}`; };
+function groupOf(iso) {
+  const ahead = (Date.parse(iso) - Date.parse(TODAY)) / 864e5;
+  if (ahead < 7) return "This week";
+  if (ahead < 14) return "Next week";
+  const month = MONTHS_LONG[parts(iso).m - 1];
+  return ahead < 31 ? `Later in ${month}` : month;
+}
+function tile(iso) {
+  const p = parts(iso);
+  return `<span class="tile" aria-hidden="true"><span class="dow">${DAYS[p.wd].toUpperCase()}</span><span class="day">${p.d}</span><span class="mon">${MONTHS[p.m - 1].toUpperCase()}</span></span>`;
 }
 function score(e) {
-  const total = FACTORS.reduce((s, f) => s + weights[f.key], 0) || 1;
+  const total = FACTORS.reduce((s, f) => s + weights[f.key], 0);
   return Math.round(FACTORS.reduce((s, f) => s + weights[f.key] * e.f[f.key], 0) / total * 10);
 }
-function band(s) { return s >= 70 ? ["high", "Great match"] : s >= 55 ? ["mid", "Worth a look"] : ["low", "Easy skip"]; }
-const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rating = e => Math.round(score(e) / 2) / 10;   // 0–100 score → 0.0–5.0
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const lc = s => s.toLowerCase();
+const shareText = e => `${e.title}\n${fmtDate(e.date)}, ${e.time}\n${e.venue}\n${e.url}\n\nFound on Barev Events`;
 
-function shareText(e) {
-  return `${e.title}\n${fmtDate(e.date)}, ${e.time}\n${e.venue}\n${e.url}\n\nFound on Barev Events`;
+// Every word typed must appear somewhere in the event; accents and case are ignored.
+const fold = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[’']/g, "").toLowerCase();
+function matches(e, query) {
+  if (!query) return true;
+  const hay = fold([e.title, e.org, e.venue, e.city, e.reason, e.price, fmtDate(e.date)].join(" "));
+  return fold(query).split(/\s+/).every(w => hay.includes(w));
 }
 
-function renderSliders() {
-  document.getElementById("sliders").innerHTML = FACTORS.map(f => `
-    <div class="slider">
-      <label for="w-${f.key}">${f.label}</label>
-      <input type="range" id="w-${f.key}" min="0" max="50" step="5" value="${weights[f.key]}" data-key="${f.key}">
-      <output for="w-${f.key}" id="o-${f.key}">${weights[f.key]}</output>
-    </div>`).join("");
+function goingLine(e) {
+  const n = e.going.length;
+  if (profile && profile.industry !== "Other") {
+    const same = e.going.filter(p => p.industry === profile.industry);
+    const helpers = same.filter(p => p.status === "helping").length;
+    if (!same.length) return `<b>${n} Armenians going</b>`;
+    return `<b>${n} going</b> · ${same.length} in ${lc(profile.industry)}${helpers ? `, ${helpers} open to helping` : ""}`;
+  }
+  const counts = {};
+  e.going.forEach(p => { counts[p.industry] = (counts[p.industry] || 0) + 1; });
+  const [ind, c] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  return `<b>${n} Armenians going</b> · ${c} in ${lc(ind)}`;
+}
+const faces = list => `<span class="faces" aria-hidden="true">${list.slice(0, 3).map((p, k) => `<span class="c${k}">${p.name[0]}</span>`).join("")}</span>`;
+
+function helloText(e, p) {
+  const me = profile ? ` I'm ${profile.name}${profile.title ? `, ${profile.title}` : ""} in ${lc(profile.industry)}.` : "";
+  const ask = p.status === "helping" ? ` I'd love to hear how you got into ${lc(p.industry)}.`
+    : p.status === "work" ? ` I saw you're open to work and would be happy to chat.`
+    : ` Happy to share what I know if it helps.`;
+  const where = e ? `I saw you're going to ${e.title}.` : `I found you on Barev Events.`;
+  return `Hi ${p.name}, ${where}${me}${ask} ${e ? "Could we say hello there?" : "Would you be up for a quick chat?"}`;
 }
 
-function render() {
+function personRow(p, key, e, k, extra = "") {
+  const done = sent.has(key);
+  const action = done ? `<span class="tick">Hello sent ✓</span>`
+    : composing === key ? "" : `<button type="button" class="btn sm people" data-hello="${esc(key)}">Say hello</button>`;
+  return `<li class="person">
+    <div class="av c${k % 3}" aria-hidden="true">${p.name[0]}</div>
+    <div class="who"><b>${p.name}</b><small>${p.title} · ${p.industry}</small><span class="status ${p.status}">${STATUS[p.status]}</span>${extra}</div>
+    ${action}
+    ${composing === key ? `<div class="compose">
+      <label for="msg-${k}">Your hello to ${p.name}</label>
+      <textarea id="msg-${k}">${esc(helloText(e, p))}</textarea>
+      ${profile ? "" : `<p class="note">Add your profile in the You tab so ${p.name} knows who you are.</p>`}
+      <div class="row"><button type="button" class="btn sm people solid" data-send="${esc(key)}">Send hello</button><button type="button" class="btn sm" data-cancel="1">Cancel</button></div>
+    </div>` : ""}
+    ${done ? `<p class="sent">${p.name} will get your request. Once they accept, you can chat.</p>` : ""}
+  </li>`;
+}
+
+/* Events view */
+function renderEvents() {
   const sortBy = document.getElementById("sort").value;
+  const query = document.getElementById("q").value.trim();
   const items = EVENTS
     .filter(e => city === "all" || (city === "Other" ? !["London", "Manchester"].includes(e.city) : e.city === city))
-    .map(e => ({ ...e, s: score(e) }))
-    .sort((a, b) => sortBy === "date" ? a.date.localeCompare(b.date) || b.s - a.s : b.s - a.s || a.date.localeCompare(b.date));
-
-  const label = city === "all" ? "across the UK" : city === "Other" ? "in the rest of the UK" : `in ${city}`;
-  document.getElementById("count").textContent = `${items.length} upcoming event${items.length === 1 ? "" : "s"} ${label}`;
-
+    .filter(e => matches(e, query))
+    .sort((a, b) => sortBy === "date" ? a.date.localeCompare(b.date) || rating(b) - rating(a) : rating(b) - rating(a) || a.date.localeCompare(b.date));
   const list = document.getElementById("list");
+  const where = city === "all" ? "across the UK" : city === "Other" ? "in the rest of the UK" : `in ${city}`;
   if (!items.length) {
-    list.innerHTML = `<div class="empty"><strong>No events found ${label} yet</strong>We couldn't find public listings here. This is exactly the gap organiser submissions will fill. Know an event? Tell the organiser about Barev Events.</div>`;
+    list.innerHTML = query
+      ? `<div class="empty"><strong>No events match “${esc(query)}” ${where}</strong>Try a shorter word, an organiser like AGBU, or a type of event like dance or dinner.</div>`
+      : `<div class="empty"><strong>No events ${where} yet</strong>We couldn't find public listings here. Organiser submissions will fill this gap.</div>`;
     return;
   }
-  list.innerHTML = items.map((e, i) => {
-    const [cls, word] = band(e.s);
-    return `<article class="card">
-      <div class="score ${cls}" aria-label="Worth It score ${e.s} out of 100"><b>${e.s}</b><small>${word}</small></div>
-      <div class="body">
-        <div class="meta"><span class="when">${fmtDate(e.date)} · ${esc(e.time)}</span><span>${esc(e.venue)}</span></div>
-        <h2>${esc(e.title)}</h2>
-        <div class="meta"><span>${esc(e.org)}</span><span>${esc(e.price)}</span></div>
-        <p class="reason">${esc(e.reason)}</p>
-        ${e.flag ? `<div class="flag">⚠ ${esc(e.flag)}. Check the listing before you go.</div>` : ""}
-        <div class="bars">${FACTORS.map(f => `<div class="bar">${f.label}<i style="--v:${e.f[f.key] * 10}%"></i></div>`).join("")}</div>
-        <div class="actions">
-          <a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(shareText(e))}" target="_blank" rel="noopener">Share on WhatsApp</a>
-          <a class="btn" href="${e.url}" target="_blank" rel="noopener">View listing</a>
-          <button type="button" class="btn" data-copy="${i}">Copy details</button>
-        </div>
-      </div>
-    </article>`;
-  }).join("");
-  list.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => {
-    const e = items[+b.dataset.copy];
-    navigator.clipboard.writeText(shareText(e)).then(() => { b.textContent = "Copied"; }, () => { b.textContent = "Copy failed"; });
-    setTimeout(() => { b.textContent = "Copy details"; }, 1800);
-  }));
+  const groups = [];
+  items.forEach(e => {
+    const g = sortBy === "date" ? groupOf(e.date) : "Top rated";
+    if (!groups.length || groups.at(-1).name !== g) groups.push({ name: g, items: [] });
+    groups.at(-1).items.push(e);
+  });
+  list.innerHTML = groups.map(g => `<section class="group"><h3>${g.name}</h3><ul class="events">${g.items.map(eventCard).join("")}</ul></section>`).join("");
+}
+function eventCard(e) {
+  return `<li><button type="button" class="ev" data-open="${e.id}">
+    ${tile(e.date)}
+    <span class="ev-body">
+      <span class="ev-title">${esc(e.title)}</span>
+      <span class="ev-meta">${esc(e.time)} · ${esc(e.venue)}</span>
+      <span class="ev-facts"><span class="price">${esc(e.price.split(" · ")[0])}</span><span class="rate"><span class="star" aria-hidden="true">★</span> ${rating(e).toFixed(1)}<span class="sr"> out of 5</span></span></span>
+      <span class="ev-people">${faces(e.going)}<span>${goingLine(e)}</span></span>
+    </span>
+    <svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5"/></svg>
+  </button></li>`;
 }
 
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-  city = b.dataset.city;
-  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
-  render();
-}));
-document.getElementById("sort").addEventListener("change", render);
-document.getElementById("sliders").addEventListener("input", ev => {
-  const k = ev.target.dataset.key; if (!k) return;
-  weights[k] = +ev.target.value;
-  document.getElementById(`o-${k}`).textContent = weights[k];
-  store.set("barev-weights", weights);
-  render();
+/* Event sheet */
+function renderSheet() {
+  const e = EVENTS[sheetId];
+  const body = document.getElementById("sheet-body");
+  const keep = body.scrollTop;
+  const r = rating(e);
+  const inds = [...new Set(e.going.map(p => p.industry))];
+  const f = indFilter.get(e.id) || (profile && inds.includes(profile.industry) ? profile.industry : "All");
+  const shown = f === "All" ? e.going : e.going.filter(p => p.industry === f);
+  const on = joined.has(e.id);
+  body.innerHTML = `
+    <div class="sh-hero">${tile(e.date)}<div><p class="sh-org">${esc(e.org)}</p><h2 id="sheet-title">${esc(e.title)}</h2></div></div>
+    <dl class="facts">
+      <div><dt>When</dt><dd>${fmtLong(e.date)} · ${esc(e.time)}</dd></div>
+      <div><dt>Where</dt><dd>${esc(e.venue)}</dd></div>
+      <div><dt>Price</dt><dd>${esc(e.price)}</dd></div>
+    </dl>
+    <div class="row">
+      <a class="btn primary" href="${e.url}" target="_blank" rel="noopener">Tickets and full listing</a>
+      <a class="btn" href="https://wa.me/?text=${encodeURIComponent(shareText(e))}" target="_blank" rel="noopener">Share on WhatsApp</a>
+    </div>
+    <section class="sh-sec"><h3>About</h3><p>${esc(e.reason)}</p>
+      ${e.crowd ? `<p class="crowd">${e.crowd.n} Barev members went to ${esc(e.crowd.past)} <span class="note">(example)</span></p>` : ""}</section>
+    <section class="sh-sec">
+      <h3>Who's going <small>Example people</small></h3>
+      <p class="people-line">${faces(e.going)} ${goingLine(e)}</p>
+      <div class="chips" role="group" aria-label="Filter by industry">${["All", ...inds].map(ind => `<button type="button" data-ind="${ind}" aria-pressed="${ind === f}">${ind}</button>`).join("")}</div>
+      <div class="box"><ul class="people">${shown.map((p, k) => personRow(p, `${e.id}:${p.name}`, e, k)).join("")}</ul></div>
+      <p class="note">Only members who chose to show their profile appear. A hello is a one-off request they accept before you can chat.</p>
+    </section>
+    ${e.solo ? `<section class="sh-sec">
+      <h3>Don't go alone <small>${e.solo} people are going on their own</small></h3>
+      <p>We'd put you in a small group of 4, so you walk in knowing someone.</p>
+      <div class="box"><ul class="people">${e.group.map((p, k) => `<li class="person"><div class="av c${k}" aria-hidden="true">${p.name[0]}</div><div class="who"><b>${p.name}, ${p.age}</b><small>${p.from} · likes ${p.likes}</small></div></li>`).join("")}</ul></div>
+      ${on ? `<p class="crowd">You're in. We'll start a WhatsApp group two days before, so you can say hello first.</p>` : ""}
+      <div class="row"><button type="button" class="btn ${on ? "" : "people solid"}" data-join="${e.id}">${on ? "Leave this group" : "Join this group"}</button></div>
+    </section>` : ""}
+    <section class="sh-sec">
+      <h3>How it rates <span class="big-rate"><span class="star" aria-hidden="true">★</span> ${r.toFixed(1)}</span><small>out of 5</small></h3>
+      <div class="bars">${FACTORS.map(x => `<div class="bar">${x.label}<i style="--v:${e.f[x.key] * 10}%"></i></div>`).join("")}</div>
+      <p class="note">Networking counts most, then Armenian culture, who's there, price and travel, and the organiser's track record.</p>
+    </section>`;
+  body.scrollTop = keep;
+}
+function openSheet(id, opener) {
+  sheetId = id; lastOpener = opener || null; composing = null;
+  const s = document.getElementById("sheet");
+  s.hidden = false; document.body.classList.add("locked");
+  renderSheet();
+  document.getElementById("sheet-body").scrollTop = 0;
+  s.querySelector(".close").focus();
+}
+function closeSheet() {
+  if (sheetId === null) return;
+  const id = sheetId;
+  sheetId = null; composing = null;
+  document.getElementById("sheet").hidden = true; document.body.classList.remove("locked");
+  renderAll();
+  const back = document.querySelector(`.ev[data-open="${id}"]`) || lastOpener;
+  if (back && back.focus) back.focus();
+}
+
+/* People view */
+function renderPeople() {
+  const inds = [...new Set(PEOPLE.map(p => p.industry))];
+  document.getElementById("p-ind").innerHTML = ["All", ...inds].map(i => `<button type="button" data-pind="${i}" aria-pressed="${i === pInd}">${i}</button>`).join("");
+  document.getElementById("p-stat").innerHTML = [["All", "Any status"], ...Object.entries(STATUS)].map(([k, t]) => `<button type="button" data-pstat="${k}" aria-pressed="${k === pStat}">${t}</button>`).join("");
+  const shown = PEOPLE.filter(p => (pInd === "All" || p.industry === pInd) && (pStat === "All" || p.status === pStat));
+  document.getElementById("people-list").innerHTML = shown.length ? shown.map((p, k) => {
+    const evs = EVENTS.filter(e => e.going.includes(p)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 2);
+    const extra = evs.length ? `<span class="goes">Going to ${evs.map(e => `<button type="button" data-open="${e.id}">${esc(e.title.length > 28 ? e.title.slice(0, 26) + "…" : e.title)}</button>`).join("")}</span>` : "";
+    return personRow(p, `p:${p.name}`, null, k, extra);
+  }).join("") : `<li class="empty" style="border:0">No one matches those filters yet.</li>`;
+}
+
+/* You view */
+function renderYou() {
+  const el = document.getElementById("profile");
+  if (profile && !editingProfile) {
+    el.innerHTML = `<h3 id="pf-h">Your profile</h3>
+      <div class="pf-card"><div class="av c0" aria-hidden="true">${esc(profile.name[0].toUpperCase())}</div>
+      <div class="who"><b>${esc(profile.name)}</b><small>${esc(profile.title || "No job title")} · ${esc(profile.industry)}</small><span class="status ${profile.status}">${STATUS[profile.status]}</span></div></div>
+      <div class="row"><button type="button" class="btn sm" id="pf-edit">Edit profile</button></div>`;
+    document.getElementById("pf-edit").addEventListener("click", () => { editingProfile = true; renderYou(); });
+  } else {
+    const v = profile || { name: "", industry: "", title: "", status: "helping" };
+    el.innerHTML = `<h3 id="pf-h">Your profile</h3>
+      <p>Add your industry to see which Armenians in your field are going to each event. Other members see your name, industry, job title and status.</p>
+      <form id="pf-form" class="pf-grid" novalidate>
+        <label for="pf-name">Name<input id="pf-name" value="${esc(v.name)}" placeholder="e.g. Lena" autocomplete="given-name"></label>
+        <label for="pf-ind">Industry<select id="pf-ind"><option value="">Choose…</option>${INDUSTRIES.map(i => `<option${i === v.industry ? " selected" : ""}>${i}</option>`).join("")}</select></label>
+        <label for="pf-title">Job title<input id="pf-title" value="${esc(v.title)}" placeholder="e.g. Trainee Accountant" autocomplete="organization-title"></label>
+        <label for="pf-status">Status<select id="pf-status">${Object.entries(STATUS).map(([k, t]) => `<option value="${k}"${k === v.status ? " selected" : ""}>${t}</option>`).join("")}</select></label>
+        <div class="row" style="grid-column:1/-1"><button type="submit" class="btn primary">Save profile</button>${profile ? `<button type="button" class="btn" id="pf-cancel">Cancel</button>` : ""}<p class="form-err" id="pf-err" hidden>Add your name and industry to save.</p></div>
+      </form>`;
+    document.getElementById("pf-form").addEventListener("submit", ev => {
+      ev.preventDefault();
+      const next = { name: document.getElementById("pf-name").value.trim(), industry: document.getElementById("pf-ind").value,
+        title: document.getElementById("pf-title").value.trim(), status: document.getElementById("pf-status").value };
+      if (!next.name || !next.industry) { document.getElementById("pf-err").hidden = false; return; }
+      profile = next; editingProfile = false; store.set("barev-profile", profile);
+      indFilter.clear(); renderAll();
+    });
+    const cancel = document.getElementById("pf-cancel");
+    if (cancel) cancel.addEventListener("click", () => { editingProfile = false; renderYou(); });
+  }
+
+  const hellos = [...sent].map(key => {
+    const [where, name] = key.split(":");
+    const e = where === "p" ? null : EVENTS[+where];
+    return `<li><span>${esc(name)}${e ? ` <small>at ${esc(e.title)}</small>` : ""}</span><small>Waiting for ${esc(name)} to accept</small></li>`;
+  });
+  document.getElementById("hellos").innerHTML = hellos.length ? `<ul class="mini">${hellos.join("")}</ul>`
+    : `<p class="note" style="margin:0">No hellos yet. Open an event, look at who's going, and tap Say hello.</p>`;
+
+  const groups = [...joined].filter(id => EVENTS[id]).map(id => EVENTS[id]).sort((a, b) => a.date.localeCompare(b.date));
+  document.getElementById("groups").innerHTML = groups.length
+    ? `<ul class="mini">${groups.map(e => `<li><span>${esc(e.title)} <small>${fmtDate(e.date)}</small></span><button type="button" class="linkish" data-open="${e.id}">Open</button></li>`).join("")}</ul>`
+    : `<p class="note" style="margin:0">No groups yet. Open an event and join a Don't go alone group.</p>`;
+}
+
+function renderGreeting() {
+  document.getElementById("greet").innerHTML = profile
+    ? `<span class="hy" lang="hy">Բարեւ</span>, ${esc(profile.name)}`
+    : `<span class="hy" lang="hy">Բարեւ</span> (barev), hello`;
+}
+function renderAll() { renderGreeting(); renderEvents(); renderPeople(); renderYou(); if (sheetId !== null) renderSheet(); }
+
+/* Tabs */
+const TABS = ["events", "people", "you"];
+function showTab(name, scroll = true) {
+  if (!TABS.includes(name)) name = "events";
+  TABS.forEach(t => {
+    document.getElementById(`view-${t}`).hidden = t !== name;
+    const b = document.querySelector(`[data-tab="${t}"]`);
+    t === name ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current");
+  });
+  try { history.replaceState(null, "", `#${name}`); } catch {}
+  if (scroll) window.scrollTo(0, 0);
+}
+
+/* One click handler for everything rendered from templates */
+document.addEventListener("click", ev => {
+  if (ev.target.id === "sheet") { closeSheet(); return; }
+  const t = ev.target.closest("button, a"); if (!t || t.tagName === "A") return;
+  const d = t.dataset;
+  if (d.tab) return showTab(d.tab);
+  if (d.open !== undefined) return openSheet(+d.open, t);
+  if (d.close) return closeSheet();
+  if (d.city) {
+    city = d.city;
+    document.querySelectorAll("[data-city]").forEach(x => x.setAttribute("aria-pressed", x === t));
+    return renderEvents();
+  }
+  if (d.ind) indFilter.set(sheetId, d.ind);
+  else if (d.pind) pInd = d.pind;
+  else if (d.pstat) pStat = d.pstat;
+  else if (d.hello) composing = d.hello;
+  else if (d.cancel) composing = null;
+  else if (d.send) { sent.add(d.send); store.set("barev-sent", [...sent]); composing = null; }
+  else if (d.join !== undefined) {
+    const id = +d.join; joined.has(id) ? joined.delete(id) : joined.add(id); store.set("barev-joined", [...joined]);
+  } else return;
+  renderAll();
+  if (composing) { const ta = document.querySelector(sheetId !== null ? "#sheet .compose textarea" : ".compose textarea"); if (ta) ta.focus(); }
 });
-document.getElementById("reset").addEventListener("click", () => {
-  weights = defaults(); store.set("barev-weights", weights); renderSliders(); render();
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Escape" && sheetId !== null) closeSheet();
+  if (ev.key === "Tab" && sheetId !== null) {   // keep focus inside the open sheet
+    const f = [...document.querySelectorAll("#sheet button, #sheet a, #sheet textarea")].filter(x => x.offsetParent !== null);
+    if (!f.length) return;
+    if (ev.shiftKey && document.activeElement === f[0]) { ev.preventDefault(); f.at(-1).focus(); }
+    else if (!ev.shiftKey && document.activeElement === f.at(-1)) { ev.preventDefault(); f[0].focus(); }
+  }
 });
 
-renderSliders();
-render();
+document.getElementById("rate-form").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const form = ev.target;
+  if (!form.met.value || !form.cult.value || !form.age.value) {
+    document.getElementById("rate-submit").textContent = "Answer all three to send";
+    return;
+  }
+  form.hidden = true;
+  document.getElementById("rate-thanks").hidden = false;
+});
+document.getElementById("sort").addEventListener("change", renderEvents);
+const q = document.getElementById("q"), qClear = document.getElementById("q-clear");
+q.addEventListener("input", () => { qClear.hidden = !q.value; renderEvents(); });
+qClear.addEventListener("click", () => { q.value = ""; qClear.hidden = true; q.focus(); renderEvents(); });
+
+renderAll();
+showTab(location.hash.slice(1) || "events", false);
 </script>
 </body>
 </html>
