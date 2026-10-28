@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Barev Events</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Noto+Sans+Armenian:wght@700&display=swap">
+<style>
+/* Layout: playful product page. Apricot hero with a phone mock and stickers, a scrolling band of real events,
+   then How it works, features, who it's for, why it's hard to copy, what's next, privacy, and a big CTA. */
+:root {
+  --bg: #fffaf6;
+  --paper: #ffffff;
+  --apricot: #ffe9d4;
+  --ink: #1d181a;
+  --muted: #6b6165;
+  --line: #efe4dc;
+  --red: #d90012;     /* flag red */
+  --blue: #0033a0;    /* flag blue */
+  --orange: #f2a800;  /* flag orange */
+  --orange-ink: #8f560a;
+  --blue-soft: #e8eefb;
+  --red-soft: #fde6e8;
+  --shadow: 0 2px 4px rgba(60, 25, 20, .05), 0 18px 40px rgba(60, 25, 20, .10);
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hy: "Noto Sans Armenian", "Sylfaen", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141113; --paper: #1e191c; --apricot: #2b1f19; --ink: #f4eef0; --muted: #ab9fa4; --line: #362d31;
+    --red: #ff5a67; --blue: #8aa8ff; --orange: #f6b53a; --orange-ink: #f6b53a; --blue-soft: #1d2641; --red-soft: #3a191e;
+    --shadow: 0 2px 4px rgba(0,0,0,.3), 0 18px 40px rgba(0,0,0,.35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141113; --paper: #1e191c; --apricot: #2b1f19; --ink: #f4eef0; --muted: #ab9fa4; --line: #362d31;
+  --red: #ff5a67; --blue: #8aa8ff; --orange: #f6b53a; --orange-ink: #f6b53a; --blue-soft: #1d2641; --red-soft: #3a191e;
+  --shadow: 0 2px 4px rgba(0,0,0,.3), 0 18px 40px rgba(0,0,0,.35); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55; overflow-x: hidden; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.flag { height: 8px; background: linear-gradient(90deg, var(--red) 0 33.33%, var(--blue) 33.33% 66.67%, var(--orange) 66.67%); }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.025em; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(30px, 4.6vw, 46px); font-weight: 800; line-height: 1.05; }
+h3 { font-size: 20px; font-weight: 700; line-height: 1.2; }
+p { margin: 0; }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); }
+.lede { color: var(--muted); max-width: 56ch; font-size: 18px; }
+section { padding-block: 72px; }
+.head { display: grid; gap: 12px; margin-bottom: 36px; }
+
+/* Nav */
+nav.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 22px; text-decoration: none; }
+.mark { width: 30px; height: 20px; border-radius: 4px; background: linear-gradient(var(--red) 0 33.33%, var(--blue) 33.33% 66.67%, var(--orange) 66.67%); }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px; font-weight: 600; text-decoration: none; border: 2px solid var(--ink); transition: transform .15s; }
+.btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.ghost { background: transparent; }
+.btn.sm { padding: 8px 16px; font-size: 15px; }
+.btn:hover { transform: translateY(-2px); }
+
+/* Hero */
+.hero { background: var(--apricot); border-radius: 32px; padding: clamp(28px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 40px; align-items: center; position: relative; overflow: hidden; }
+.hero h1 { font-size: clamp(44px, 7.5vw, 86px); font-weight: 800; line-height: .95; }
+.hero h1 em { font-style: normal; color: var(--red); position: relative; white-space: nowrap; }
+.hero h1 em::after { content: ""; position: absolute; left: 0; right: 0; bottom: .02em; height: .14em; background: var(--orange); border-radius: 99px; z-index: -1; opacity: .8; }
+.hero-copy { display: grid; gap: 22px; position: relative; z-index: 1; }
+.hello { font-family: var(--hy); font-weight: 700; color: var(--blue); font-size: 20px; }
+.hello span { font-family: var(--body); font-weight: 500; color: var(--muted); font-size: 15px; margin-left: 6px; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Phone mock */
+.stage { position: relative; display: grid; place-items: center; min-height: 460px; }
+.phone { width: min(290px, 100%); background: var(--bg); border: 10px solid var(--ink); border-radius: 40px; padding: 18px 14px 22px; box-shadow: var(--shadow); display: grid; gap: 10px; transform: rotate(3deg); }
+.phone .bar { display: flex; justify-content: space-between; align-items: center; font-family: var(--display); font-weight: 800; font-size: 15px; }
+.phone .bar i { width: 22px; height: 15px; border-radius: 3px; background: linear-gradient(var(--red) 0 33.33%, var(--blue) 33.33% 66.67%, var(--orange) 66.67%); }
+.mini-label { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.ev { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
+.tile { background: var(--apricot); border-radius: 10px; display: grid; place-items: center; align-content: center; line-height: 1; padding: 6px 0; }
+.tile small { font-size: 8.5px; font-weight: 700; letter-spacing: .08em; color: var(--orange-ink); }
+.tile b { font-family: var(--display); font-size: 19px; font-weight: 800; }
+.ev strong { font-family: var(--display); font-size: 14px; line-height: 1.15; display: block; }
+.ev .meta { font-size: 11.5px; color: var(--muted); }
+.ev .ppl { font-size: 11.5px; color: var(--blue); font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+.faces { display: inline-flex; }
+.faces span { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--paper); margin-left: -5px; font-size: 8px; color: #fff; display: grid; place-items: center; font-weight: 700; }
+.faces span:first-child { margin-left: 0; }
+.r { background: var(--red); } .b { background: var(--blue); } .o { background: var(--orange-ink); }
+.bubble { background: var(--blue); color: #fff; font-size: 12.5px; padding: 10px 12px; border-radius: 14px 14px 4px 14px; justify-self: end; max-width: 92%; line-height: 1.35; }
+.sticker { position: absolute; font-family: var(--display); font-weight: 800; padding: 8px 14px; border-radius: 14px; box-shadow: var(--shadow); white-space: nowrap; z-index: 2; }
+.s1 { top: 4%; left: 0; background: var(--red); color: #fff; transform: rotate(-9deg); font-family: var(--hy); font-size: 20px; }
+.s2 { bottom: 14%; left: -4%; background: var(--paper); color: var(--ink); transform: rotate(-5deg); font-size: 15px; }
+.s2 b { color: var(--orange); }
+.s3 { top: 26%; right: -2%; background: var(--orange); color: #1d181a; transform: rotate(8deg); font-size: 15px; }
+
+/* Event band */
+.band { margin-top: 28px; overflow: hidden; border-block: 2px solid var(--ink); background: var(--paper); }
+.band-track { display: flex; gap: 40px; padding-block: 14px; width: max-content; }
+.band-track span { font-family: var(--display); font-weight: 700; font-size: 18px; white-space: nowrap; display: inline-flex; align-items: center; gap: 40px; }
+.band-track span::after { content: ""; width: 12px; height: 12px; background: var(--red); transform: rotate(45deg); }
+.band-track span:nth-child(3n+2)::after { background: var(--blue); }
+.band-track span:nth-child(3n)::after { background: var(--orange); }
+
+/* Steps */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; counter-reset: step; }
+.step { background: var(--paper); border: 2px solid var(--ink); border-radius: 24px; padding: 26px; display: grid; gap: 10px; align-content: start; box-shadow: 6px 6px 0 var(--ink); }
+.step:nth-child(2) { box-shadow: 6px 6px 0 var(--blue); border-color: var(--blue); }
+.step:nth-child(3) { box-shadow: 6px 6px 0 var(--red); border-color: var(--red); }
+.step::before { counter-increment: step; content: counter(step); font-family: var(--display); font-weight: 800; font-size: 44px; line-height: 1; color: var(--orange); }
+.step p { color: var(--muted); }
+
+/* Features */
+.feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.feat { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: grid; gap: 8px; align-content: start; }
+.feat .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; }
+.feat .ico svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ico.red { background: var(--red-soft); color: var(--red); } .ico.blue { background: var(--blue-soft); color: var(--blue); } .ico.orange { background: var(--apricot); color: var(--orange-ink); }
+.feat p { color: var(--muted); font-size: 15.5px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip { font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 6px; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+.chip.advice::before { background: var(--orange); } .chip.work::before { background: var(--red); }
+
+/* Who */
+.who { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.persona { border-radius: 22px; padding: 22px; display: grid; gap: 8px; align-content: start; }
+.persona:nth-child(1) { background: var(--red-soft); transform: rotate(-1.2deg); }
+.persona:nth-child(2) { background: var(--blue-soft); transform: rotate(.8deg); }
+.persona:nth-child(3) { background: var(--apricot); transform: rotate(-.6deg); }
+.persona:nth-child(4) { background: var(--paper); border: 1px solid var(--line); transform: rotate(1.1deg); }
+.persona p { font-size: 15.5px; color: var(--muted); }
+.persona .need { color: var(--ink); font-weight: 600; font-size: 15px; }
+
+/* Moat */
+.moat { background: var(--ink); color: var(--bg); border-radius: 32px; padding: clamp(28px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.moat .eyebrow { color: var(--orange); }
+.moat .lede { color: color-mix(in srgb, var(--bg) 72%, transparent); }
+.vs { display: grid; gap: 12px; }
+.vs div { border-radius: 16px; padding: 16px 18px; display: grid; gap: 4px; }
+.vs .them { border: 1.5px dashed color-mix(in srgb, var(--bg) 35%, transparent); }
+.vs .us { background: var(--red); color: #fff; }
+.vs small { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+
+/* Next + privacy */
+.split { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 24px; }
+.next { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.next div { background: var(--paper); border: 1px dashed var(--muted); border-radius: 18px; padding: 18px; display: grid; gap: 4px; }
+.next p, .privacy li { color: var(--muted); font-size: 15px; }
+.soon { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--orange-ink); text-transform: uppercase; }
+.privacy { background: var(--blue-soft); border-radius: 24px; padding: 24px; display: grid; gap: 12px; align-content: start; }
+.privacy ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.privacy li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; }
+.privacy li::before { content: "✓"; color: var(--blue); font-weight: 800; }
+
+/* Organisers + facts */
+.orgs { display: flex; flex-wrap: wrap; gap: 10px; }
+.orgs span { font-family: var(--display); font-weight: 700; font-size: 17px; padding: 10px 18px; border-radius: 999px; border: 2px solid var(--line); background: var(--paper); }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.fact { border-top: 3px solid var(--ink); padding-top: 12px; display: grid; gap: 2px; }
+.fact b { font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.fact:nth-child(1) b { color: var(--red); } .fact:nth-child(2) b { color: var(--blue); } .fact:nth-child(3) b { color: var(--orange-ink); }
+.fact span { font-size: 14px; color: var(--muted); }
+
+/* CTA */
+.cta { text-align: center; display: grid; justify-items: center; gap: 18px; background: var(--apricot); border-radius: 32px; padding: clamp(36px, 6vw, 72px) 24px; position: relative; overflow: hidden; }
+.cta h2 { font-size: clamp(36px, 6vw, 64px); max-width: 14ch; }
+.cta .hy-big { font-family: var(--hy); font-weight: 700; font-size: clamp(48px, 9vw, 96px); color: var(--red); line-height: 1; transform: rotate(-4deg); }
+.url { font-size: 14px; color: var(--muted); word-break: break-all; }
+footer { padding-block: 32px 48px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
+
+@media (max-width: 860px) {
+  .hero, .moat, .split { grid-template-columns: 1fr; }
+  .steps, .feats { grid-template-columns: 1fr 1fr; }
+  .who, .facts { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  section { padding-block: 52px; }
+  .steps, .feats, .who, .next { grid-template-columns: 1fr; }
+  .stage { min-height: 420px; }
+  .s2 { left: 0; } .s3 { right: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .band-track { animation: slide 38s linear infinite; }
+  .sticker { animation: bob 4s ease-in-out infinite; }
+  .s2 { animation-delay: -1.3s; } .s3 { animation-delay: -2.6s; }
+  .persona { transition: transform .2s; }
+  .persona:hover { transform: rotate(0) translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+@keyframes slide { to { transform: translateX(-50%); } }
+@keyframes bob { 50% { translate: 0 -6px; } }
+</style>
+</head>
+<body>
+
+<div class="flag" aria-hidden="true"></div>
+<div class="wrap">
+  <nav class="top" aria-label="Main">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span>Barev Events</a>
+    <a class="btn sm primary" href="https://jacqueq89.github.io/Hello-Hackday/barev.html" target="_blank" rel="noopener">Try the prototype</a>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-copy">
+      <p class="hello" lang="hy">Բարեւ<span lang="en">barev, hello</span></p>
+      <h1>Never walk in <em>alone.</em></h1>
+      <p class="lede">Every Armenian event in the UK in one place, with who's going, how much you'll actually get to meet people, and a way to say hello before you arrive.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://jacqueq89.github.io/Hello-Hackday/barev.html" target="_blank" rel="noopener">Open the live prototype</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <span class="sticker s1">Բարեւ!</span>
+      <span class="sticker s3">6 going · 2 in finance</span>
+      <span class="sticker s2"><b>★</b> 4.2 for meeting people</span>
+      <div class="phone">
+        <div class="bar">Barev Events <i></i></div>
+        <div class="mini-label">This week</div>
+        <div class="ev"><div class="tile"><small>THU</small><b>29</b><small>OCT</small></div><div><strong>BACC Launch Reception</strong><div class="meta">6:30 pm · Minories, EC3N · £30</div><div class="ppl"><span class="faces"><span class="r">A</span><span class="b">N</span><span class="o">M</span></span>5 going</div></div></div>
+        <div class="mini-label">Next week</div>
+        <div class="ev"><div class="tile"><small>SUN</small><b>8</b><small>NOV</small></div><div><strong>The Bakery Session</strong><div class="meta">3–6 pm · Jakob's, SW7 · £27.80</div><div class="ppl"><span class="faces"><span class="r">N</span><span class="b">L</span><span class="o">S</span></span>6 going · 2 in finance</div></div></div>
+        <div class="ev"><div class="tile"><small>SAT</small><b>7</b><small>NOV</small></div><div><strong>Armenian Circle Dances</strong><div class="meta">4–6 pm · Kensington, W8 · Free–£15</div><div class="ppl"><span class="faces"><span class="r">D</span><span class="b">T</span><span class="o">H</span></span>7 going</div></div></div>
+        <div class="bubble">Hi Narek, I saw you're going to The Bakery Session. Could we say hello there?</div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<div class="band" aria-label="Real events in the prototype">
+  <div class="band-track">
+    <span>The Bakery Session</span><span>Armenian Circle Dances</span><span>25th Anniversary Gala</span><span>BACC Launch Reception</span><span>Celebration of Armenian Music</span><span>Hovig Live</span><span>Echoes of the Past</span><span>Bones in the Desert</span>
+    <span aria-hidden="true">The Bakery Session</span><span aria-hidden="true">Armenian Circle Dances</span><span aria-hidden="true">25th Anniversary Gala</span><span aria-hidden="true">BACC Launch Reception</span><span aria-hidden="true">Celebration of Armenian Music</span><span aria-hidden="true">Hovig Live</span><span aria-hidden="true">Echoes of the Past</span><span aria-hidden="true">Bones in the Desert</span>
+  </div>
+</div>
+
+<main class="wrap">
+  <section aria-labelledby="problem-h">
+    <div class="head">
+      <p class="eyebrow">The problem</p>
+      <h2 id="problem-h">The events exist. Finding your people there is the hard part.</h2>
+      <p class="lede">Armenian events in the UK are scattered across Facebook, Instagram, Armenopole and organiser websites. Newcomers don't know where to look, people off social media miss them entirely, and nobody can tell from a listing whether they'll actually meet anyone.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>13</b><span>real London events in the prototype, checked 28 Oct 2026</span></div>
+      <div class="fact"><b>5</b><span>sources pulled together, from Eventbrite to the Diocese</span></div>
+      <div class="fact"><b>25–45</b><span>core age range, open to everyone</span></div>
+      <div class="fact"><b>0</b><span>social media accounts needed</span></div>
+    </div>
+  </section>
+
+  <section id="how" aria-labelledby="how-h">
+    <div class="head">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-h">From "what's on?" to "see you there" in three steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Find what's worth going to</h3><p>Browse by date, map or distance in miles. Every event gets a rating out of 5 that puts meeting people first, then Armenian music and food.</p></div>
+      <div class="step"><h3>See who's going</h3><p>Spot Armenians in your industry, plus who's open to helping, looking for advice, or open to work.</p></div>
+      <div class="step"><h3>Say hello, or go together</h3><p>Send a one-off hello before the event, or join a small Don't go alone group that meets on WhatsApp first.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="feat-h">
+    <div class="head">
+      <p class="eyebrow">What's in the prototype</p>
+      <h2 id="feat-h">Built for meeting people, not just listing events</h2>
+    </div>
+    <div class="feats">
+      <div class="feat"><div class="ico red"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div><h3>Every event, one feed</h3><p>Search, filter by city, and sort by soonest, top rated or nearest. Real prices, including booking fees.</p></div>
+      <div class="feat"><div class="ico blue"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><h3>Map and distances</h3><p>Pins for every venue, your location or chosen area, distances in miles, and one-tap directions.</p></div>
+      <div class="feat"><div class="ico orange"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></div><h3>A rating that means something</h3><p>Networking 35%, culture 25%, people 15%, practical 15%, reputation 10%. Attendees' answers after events feed it.</p></div>
+      <div class="feat"><div class="ico blue"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M17 14.5c2.5 0 4.2 1.6 4.6 4.5"/></svg></div><h3>Who's going, by industry</h3><p>Profiles show only name, industry, job title and status.</p><div class="chip-row"><span class="chip">Open to helping</span><span class="chip advice">Looking for advice</span><span class="chip work">Open to work</span></div></div>
+      <div class="feat"><div class="ico red"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg></div><h3>Say hello first</h3><p>A friendly, pre-written message you can edit. They accept before any chat opens.</p></div>
+      <div class="feat"><div class="ico orange"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19c.5-3 2.7-4.5 5.5-4.5s5 1.5 5.5 4.5M10.5 19c.5-3 2.7-4.5 5.5-4.5s5 1.5 5.5 4.5"/></svg></div><h3>Don't go alone</h3><p>Join a group of 4 people going on their own. A WhatsApp group starts two days before.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="who-h">
+    <div class="head">
+      <p class="eyebrow">Who it's for</p>
+      <h2 id="who-h">Armenians across the UK, wherever they're starting from</h2>
+    </div>
+    <div class="who">
+      <div class="persona"><h3>Newcomers</h3><p>Just moved, no network yet, don't know the groups.</p><p class="need">Needs: a way in, and a first friendly face.</p></div>
+      <div class="persona"><h3>UK-born</h3><p>Family ties, but feeling a little distant from the community.</p><p class="need">Needs: a reason to go, and people their age.</p></div>
+      <div class="persona"><h3>Off social media</h3><p>Miss everything posted only on Facebook or Instagram.</p><p class="need">Needs: events by WhatsApp, email or a link.</p></div>
+      <div class="persona"><h3>Early career</h3><p>Want to meet Armenians in their field.</p><p class="need">Needs: someone open to helping, at the next event.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="moat-h">
+    <div class="moat">
+      <div class="head" style="margin:0">
+        <p class="eyebrow">Why it's hard to copy</p>
+        <h2 id="moat-h">A search engine can list events. It can't tell you who'll be there.</h2>
+        <p class="lede">Who's going, who's open to helping, who you met last time, and how an event really felt only exist because members share them. That's data no web search or AI agent can produce.</p>
+      </div>
+      <div class="vs">
+        <div class="them"><small>A web search or AI agent</small><span>"Here are 13 Armenian events in London."</span></div>
+        <div class="us"><small>Barev Events</small><span>"6 are going to the Bakery Session, 2 in finance. Narek is open to helping. Want to say hello?"</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="split">
+      <div>
+        <div class="head"><p class="eyebrow">Coming next</p><h2 id="next-h">What we'll build after the hackday</h2></div>
+        <div class="next">
+          <div><span class="soon">Next</span><h3>People you've met</h3><p>Check in with a QR code and the app remembers who you met.</p></div>
+          <div><span class="soon">Next</span><h3>Mentoring matches</h3><p>A monthly coffee with an Armenian further along in your field.</p></div>
+          <div><span class="soon">Next</span><h3>Barev Tables</h3><p>Small dinners for 6 at Jakob's and other Armenian restaurants.</p></div>
+          <div><span class="soon">Next</span><h3>Weekly digest</h3><p>Top events by email or WhatsApp, no app needed.</p></div>
+        </div>
+      </div>
+      <aside class="privacy" aria-labelledby="priv-h">
+        <h3 id="priv-h">Privacy, built in</h3>
+        <ul>
+          <li>Only members who choose to appear are shown.</li>
+          <li>No company names or social links on profiles.</li>
+          <li>A hello must be accepted before anyone can chat.</li>
+          <li>Your device location is used for distances and never stored.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="org-h">
+    <div class="head">
+      <p class="eyebrow">Organisers</p>
+      <h2 id="org-h">Good for the people putting events on, too</h2>
+      <p class="lede">Organisers reach newcomers and people off social media, and see who came and how it was rated, in exchange for richer event details.</p>
+    </div>
+    <div class="orgs"><span>AGBU YP London</span><span>St Sarkis</span><span>Jakob's</span><span>Armenian Institute</span><span>British Armenian Chamber of Commerce</span><span>CAIA</span></div>
+  </section>
+
+  <section class="cta" aria-labelledby="cta-h">
+    <p class="hy-big" lang="hy" aria-hidden="true">Բարեւ</p>
+    <h2 id="cta-h">See you at the next one.</h2>
+    <a class="btn primary" href="https://jacqueq89.github.io/Hello-Hackday/barev.html" target="_blank" rel="noopener">Open the live prototype</a>
+    <p class="url">jacqueq89.github.io/Hello-Hackday/barev.html</p>
+  </section>
+
+  <footer>
+    <p>Barev Events is a hackday prototype by Jacque Qarbozian. Working name; a new name is on the way.</p>
+    <p>Events, times, venues and prices are real, checked 28 October 2026. Members, groups and attendance in the prototype are invented examples.</p>
+  </footer>
+</main>
+</body>
+</html>
